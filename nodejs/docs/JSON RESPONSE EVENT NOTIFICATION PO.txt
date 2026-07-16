@@ -1,0 +1,129 @@
+JSON RESPONSE EVENT NOTIFICATION POSTGRES
+
+
+El archivo tiene como objetivo mostrar la respuesta a dos eventos que están trabajando en la base de datos Autoservicio_nsx2. Cada evento genera un JSON de respuesta diferente, pero comparte un parámetro en común que es el parámetro "serial" que indica a cuál pantalla se esta enviando la información, esto ya que no se están manejando rooms en el socketIO y por ende el evento se envía a todos los clientes conectados.
+
+Actualmente están funcionando solo dos eventos:
+  "notify_event_transaction_payment",
+  "notify_event_authorization",
+
+
+1. notify_event_transaction_payment: Implementado para escuchar los diferentes estados que pueden tener las transacciones de pagos entres estos estados están: 
+
+
+//Lisat de estados
+
+0: Transacción registrada.
+1: Transacción leída.
+2: Transacción completada.
+3: Transacción rechazada.
+4: Validando transacción (Transacción pendiente).
+5: Transacción anulada.
+
+Ejemplo de envío de JSON (Cuando el pago es completado)
+
+{
+  channel: 'notify_event_transaction_payment',
+  payload: {
+    serial: 'TP1A.220624.014',
+    paymentid: 32,
+    programmingid: 2,
+    amount: 3000,
+    responsepayment: '{"isError":false,"message":"Consulta realizada","content":{"id":2,"serialId":"5d3b33feef4d3de0","idAuthorization":2,"idTransaction":32,"value":"3000","response":"{\\"isError\\":true,\\"message\\":\\"Error al procesar la transacción\\",\\"content\\":{\\"Bin\\":\\"\\",\\"codComercio\\":\\"0020202135\\",\\"Codigo_respuesta\\":\\"86\\",\\"Comercio\\":\\"PRUEBAS NEXGO N86\\",\\"Direccion\\":\\"CLL 7 9-67\\",\\"Fecha_hora\\":\\"202604081110\\",\\"Franquicia\\":\\"\\",\\"Host\\":\\"\\",\\"Mensaje_error\\":\\"El usuario ha cancelado\\",\\"numTerminal\\":\\"10LZZ772\\",\\"Numero_confirmacion\\":\\"\\",\\"Numero_cuotas\\":\\"\\",\\"panTj\\":\\"\\",\\"RRN\\":\\"\\",\\"Tipo_cuenta\\":\\"\\",\\"Tipo_medio_Pago\\":\\"\\",\\"Tipo_operacion\\":1,\\"typePayment\\":\\"\\",\\"Ultimos_digitos_tarjeta\\":\\"\\"}}","codePayment":"86","datePayment":"2026-04-08 11:10:56.236889","status":"refused","dateRequest":"2026-04-08 16:10:11"}}',
+    methodpaymentid: 1,
+    statuspaymentid: 2,
+    programmingamount: 20000,
+    amountpaid: 20000,
+    pendingamount: 0,
+    transactiondate: '2026-04-08T16:10:10.082907'
+  },
+  receivedAt: '2026-04-13T19:49:38.168Z'
+}
+
+
+
+
+2. notify_event_authorization: Implementado para escuchar los eventos de la autorización registrada luego de completar los pagos asociados a la programación.
+También se utiliza para detectar el fin venta, cada estado se debe validar desde el parámetro sync
+
+Ejemplos de los diferentes estados de la Autorización:
+
+
+JSON generado cuando se lee la autorización 
+{
+  channel: 'notify_event_authorization',
+  payload: {
+    serial: 'TP1A.220624.014',
+    authorizationid: 1,
+    positionid: 1,
+    hoseid: 1,
+    productid: 1,
+    preset: 20000,
+    programmingtypeid: 2,
+    valueamountmoney: 20000,
+    id_presetnsx: null,
+    saleid: null,
+    sync: 1
+  },
+  receivedAt: '2026-04-13T19:56:03.247Z'
+}
+
+JSON generado cuando se lee la autorización 
+{
+  channel: 'notify_event_authorization',
+  payload: {
+    serial: 'TP1A.220624.014',
+    authorizationid: 1,
+    positionid: 1,
+    hoseid: 1,
+    productid: 1,
+    preset: 20000,
+    programmingtypeid: 2,
+    valueamountmoney: 20000,
+    id_presetnsx: null,
+    saleid: null,
+    sync: 1
+  },
+  receivedAt: '2026-04-13T19:56:03.247Z'
+}
+
+
+
+JSON generado cuando NSX recibe la autorización
+{
+  channel: 'notify_event_authorization',
+  payload: {
+    serial: 'TP1A.220624.014',
+    authorizationid: 1,
+    positionid: 1,
+    hoseid: 1,
+    productid: 1,
+    preset: 20000,
+    programmingtypeid: 2,
+    valueamountmoney: 20000,
+    id_presetnsx: 500,
+    saleid: null,
+    sync: 2
+  },
+  receivedAt: '2026-04-13T19:57:31.505Z'
+}
+
+
+JSON generado cuando finaliza la venta
+{
+  channel: 'notify_event_authorization',
+  payload: {
+    serial: 'TP1A.220624.014',
+    authorizationid: 1,
+    positionid: 1,
+    hoseid: 1,
+    productid: 1,
+    preset: 20000,
+    programmingtypeid: 2,
+    valueamountmoney: 20000,
+    id_presetnsx: 500,
+    saleid: 289,
+    sync: 4
+  },
+  receivedAt: '2026-04-13T19:57:57.906Z'
+}

@@ -1,0 +1,22 @@
+{
+  "name": "console",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.87.3",
+    "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
+    "handlebars": "^4.7.8",
+    "js-yaml": "^4.1.1",
+    "nodemailer": "^8.0.2",
+    "pg": "^8.16.3"
+  }
+}
