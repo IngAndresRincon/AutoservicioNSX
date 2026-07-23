@@ -10,6 +10,7 @@ exports.processShifts = async () => {
     console.log(`Verificando turnos para hoy ${today} a las ${currentTime}`);
 
     const currentDate = `${today} ${currentTime}`;
+    console.log("Currten date validation:",currentDate);
     const availableShift = await repository.getCurrentShiftAvailable(currentDate);
     if(!availableShift) return;
 
@@ -23,6 +24,14 @@ exports.processShifts = async () => {
         logger.info(`Turno encontrado para abrir  ${currentTime}`);
         const resultOpenService = await openShiftNsx(availableShift);
 
+    }
+
+    if(availableShift.activo){
+        const shiftClose = await repository.getShiftToClose();
+        if(shiftClose){
+            logger.info(`Turno encontrado para cerrar  ${currentTime}`);
+            const resultCloseService = await closeShiftNsx(shiftClose);
+        };
     }
     return true;
 }
