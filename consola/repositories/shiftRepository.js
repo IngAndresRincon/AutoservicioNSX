@@ -10,8 +10,26 @@ exports.getShiftToOpen = async (time) => {
   
 };
 
+exports.dateValidity = async (currentDate) =>{
+    const query = `SELECT * FROM public.turno 
+    WHERE ($1 BETWEEN fecha_turno_inicial AND fecha_turno_final) AND activo = $2 AND disponible =$2 LIMIT 1;`;
+    const result = await client.query(query,[currentDate,true]);
+    return result.rowCount>0 ? true: false;
+}
 
 exports.getCurrentShiftAvailable = async (currentDate) => {
+
+//   const query = `SELECT * FROM (
+//                     SELECT id,
+//                     CONCAT( '2026-07-24',' ',hora_inicial) as fecha_inicial,
+//                     CASE WHEN hora_final < hora_inicial 
+//                     THEN CONCAT('2026-07-25',' ',hora_final) ELSE 
+//                     CONCAT( '2026-07-24',' ',hora_final)  END as fecha_final,
+//                     activo,disponible
+//                     FROM public.turno
+//                     ) as t
+//                     WHERE t.disponible = true AND fecha_inicial <= $1 AND $1 <= fecha_final LIMIT 1;`;
+
 
     const query = `SELECT * FROM (
                     SELECT id,
@@ -42,21 +60,33 @@ exports.getShiftToClose = async () => {
 
 exports.closeShift = async (shiftId) => {
 
-    const query = `UPDATE public.historico_turno SET activo = false, 
+    const query0 = `UPDATE public.historico_turno SET activo = false, 
     fecha_final = (SELECT now() AT TIME ZONE 'America/Bogota')
     WHERE id_turno = $1 AND activo = true;`;
-    await client.query(query, [shiftId]);
-    return client.query(`UPDATE public.turno SET activo = false WHERE id = $1`, [shiftId]);
+    const result0 = await client.query(query0, [shiftId]);
+
+    const query1 = `UPDATE public.turno SET activo = false WHERE id = $1`;
+    const result1 = await client.query(query1, [shiftId]);
+    return result1.rowCount>0? result1.rows[0]:null;
 }
 
-exports.openShift = async (shiftId, nsxShift) => {
+exports.openShift = async (shift, nsxShift) => {
 
-    const query = `INSERT INTO public.historico_turno (id_turno, fecha_inicial) 
+    const query0 = `INSERT INTO public.historico_turno (id_turno, fecha_inicial) 
     VALUES ($1, (SELECT now() AT TIME ZONE 'America/Bogota'));`;
-    await client.query(query, [shiftId]);
-    return client.query(`UPDATE public.turno SET activo = true,
-    fecha_registro = now(), id_turno_nsx = $2
-    WHERE id = $1`, [shiftId,nsxShift.idTurno]);
+    const result0 =await client.query(query0, [shift.id]);
+
+    const query1 = `UPDATE public.turno SET 
+    activo = true,
+    fecha_turno_inicial = $1,
+    fecha_turno_final = $2,
+    fecha_registro = now(),
+    id_turno_nsx = $3
+    WHERE id = $4 RETURNING *;`;
+
+    const result1 = await client.query(query1, [shift.fecha_inicial,shift.fecha_final,nsxShift.idTurno,shift.id]);
+    
+    return result1.rowCount>0 ?result1.rows[0] :null;
 };
 
 
