@@ -11,7 +11,7 @@ exports.getPendingAuthorization = async () => {
                       p.id_nsx_posicion as numposicion,
                       m.numero_manguera as nummanguera,
                       a.tipo_programacion as tipoprogramacion,
-                      a.preset as valor,
+                      ROUND(a.preset,2) as valor,
                       a.valor_dinero as valordinero,
                       c.placa,
                       c.km,
@@ -29,6 +29,9 @@ exports.getPendingAuthorization = async () => {
                     ON pg.id_cliente = c.id
                     WHERE a.sincronizado = 0 LIMIT 1;`;
     const res0 = await client.query(query);
+
+    console.log(JSON.stringify(res0.rows[0]));
+
     if (res0.rowCount > 0) {
       let itemAuth = res0.rows[0];
 
@@ -63,7 +66,7 @@ exports.getPendingAuthorization = async () => {
           itemAuth.numposicion,
           itemAuth.nummanguera,
           itemAuth.tipoprogramacion,
-          parseInt(itemAuth.valor),
+          parseFloat(itemAuth.valor),
           parseInt(itemAuth.valordinero),
           itemAuth.placa,
           itemAuth.km,
