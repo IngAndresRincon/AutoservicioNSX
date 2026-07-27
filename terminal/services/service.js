@@ -49,22 +49,29 @@ exports.requestResponse = async (terminal, payment) => {
     const response = await this.get(url);
     if (response != undefined) {
       if (response.status == 200 || response.status == 201) {
-        switch (response.data["content"]["status"].toLowerCase()) {
-          case "refused":
-            statusCode = 3;
-            break;
-          case "canceled":
-            statusCode = 3;
-            break;
-          case "complete":
-            statusCode = 2;
-            break;
-          case "approved":
-            statusCode = 2;
-            break;
-          case "pending":
-            break;
-        }
+
+        if(response.data['isError']){
+          statusCode=3;
+        }else{
+
+            switch (response.data["content"]["status"].toLowerCase()) {
+              case "refused":
+                statusCode = 3;
+                break;
+              case "canceled":
+                statusCode = 3;
+                break;
+              case "complete":
+                statusCode = 2;
+                break;
+              case "approved":
+                statusCode = 2;
+                break;
+              case "pending":
+                break;
+            }
+
+        }    
       } else {
         statusCode = 3;
       }
