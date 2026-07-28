@@ -96,5 +96,5 @@ exports.findFirstNSXPosition = async () => {
     const query = `SELECT id_nsx_posicion FROM public.posicion 
     WHERE id = $1 AND activo = true LIMIT 1;`; 
     const result = await client.query(query,[1]);
-    return result.rows[0]['id_nsx_posicion'] || 0;  
+    return result.rowCount>0?result.rows[0]['id_nsx_posicion'] : 0;  
 }

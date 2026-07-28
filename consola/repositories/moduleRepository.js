@@ -114,6 +114,8 @@ exports.recordDispenserMapping = async (params) => {
       TRUNCATE TABLE public.dispensador RESTART IDENTITY CASCADE;
       TRUNCATE TABLE public.posicion RESTART IDENTITY CASCADE;
       TRUNCATE TABLE public.manguera RESTART IDENTITY CASCADE;
+      TRUNCATE TABLE public.pantalla RESTART IDENTITY CASCADE;
+      TRUNCATE TABLE public.pantalla_posicion RESTART IDENTITY CASCADE;
       `;
     await client.query(query);
 
@@ -125,14 +127,14 @@ exports.recordDispenserMapping = async (params) => {
         const listDispenserSide = params[i].caras;
 
         for (let j = 0; j < listDispenserSide.length; j++) {
-          const idDispenserSide = listDispenserSide[j].numeroCara;
+          const dispenserSide = listDispenserSide[j];
           const listPositions = listDispenserSide[j].posiciones;
           for (let k = 0; k < listPositions.length; k++) {
             query = `INSERT INTO public.posicion (id_dispensador,cara,id_nsx_posicion,
             mangueras,formato_dinero,formato_volumen,formato_precio,codigo_tankio)
                     VALUES (
                     ${idDispenser}, 
-                    ${idDispenserSide}, 
+                    ${dispenserSide.numeroCara}, 
                     ${listPositions[k].idPosicion},
                     ${listPositions[k].mangueras.length},
                     ${listPositions[k].formato.formatoDinero},
@@ -142,6 +144,8 @@ exports.recordDispenserMapping = async (params) => {
 
             const res2 = await client.query(query);
             if (res2.rowCount > 0) {
+
+              // Insertar información de manguera
               const listHose = listPositions[k].mangueras;
               const idPosition = res2.rows[0].id;
               for (let m = 0; m < listHose.length; m++) {
@@ -155,6 +159,20 @@ exports.recordDispenserMapping = async (params) => {
                         '${listHose[m].color}',
                         ${listHose[m].producto.maximoPreset});`;
                 await client.query(query);
+              }
+
+
+              //Insertar información de pantallas 
+
+              const query3 = `INSERT INTO public.pantalla (serial,ip) VALUES($1,$2) RETURNING *;`;
+              const res3 = await client.query(query3,[ dispenserSide.serialPantalla,'0.0.0.0']);
+              if(res3.rowCount>0){
+
+                //Insertar relación pantalla_posición
+                const query4 = `INSERT INTO public.pantalla_posicion (id_pantalla,id_posicion)
+                VALUES ($1,$2) RETURNING *;`;
+                const res4 = await client.query(query4,[res3.rows[0].id,idPosition]);
+                console.log(res4.rowCount>0?true:false) ;
               }
             }
           }

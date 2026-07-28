@@ -89,7 +89,7 @@ async function openShiftNsx(shift) {
         await repository.openShift(shift,nsxShift);
         return true;
     }else{
-        console.log(`Error abriendo turno: ${JSON.stringfy(result.data)}`);
+        console.log(`Error abriendo turno: ${JSON.stringify(shift)}`);
     }
 }
 

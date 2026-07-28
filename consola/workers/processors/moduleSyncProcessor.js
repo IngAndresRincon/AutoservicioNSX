@@ -8,12 +8,12 @@ async function processModuleSync() {
     if (response) {
       await service.syncModule();
       const duration = Date.now() - startTime;
-      logger.info(`SincronizaciÃ³n de mÃ³dulo completada en ${duration}ms`);
+      logger.info(`Sincronización de módulo completada en ${duration}ms`);
       return true;
     }
     return false;
   } catch (error) {
-    logger.error(`Error al sincronizar mÃ³dulo: ${error.message}`);
+    logger.error(`Error al sincronizar módulo: ${error.message}`);
     return false;
   }
 }
