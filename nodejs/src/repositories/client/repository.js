@@ -3,7 +3,7 @@ const logger = require("../../config/logger");
 const AppError = require("../../errors/AppError");
 const { client } = require("../../database/dbpostgres");
 
-const generateNumericCode = () => String(crypto.randomInt(0, 100000000)).padStart(6, "0");
+const generateNumericCode = () => String(crypto.randomInt(0, 100000)).padStart(5, "0");
 
 exports.clientValidation = async (params) => {
   try {
