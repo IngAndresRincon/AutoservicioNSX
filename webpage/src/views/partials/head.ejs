@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/css/bootstrap.min.css">
+    <title><%= titulo || 'Mi App' %></title>
+
+    <!-- Estilo dinámico según la vista -->
+    <% if (estilo === 'login') { %>
+        <link rel="stylesheet" href="/public/css/login.css">
+    <% } else if (estilo === 'dashboard') { %>
+        <link rel="stylesheet" href="/public/css/dashboard.css">
+    <% } %>
+ 
+</head>
+<body>
+
+
+<!-- 
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/products">List of products</a></li>
+            <li><a href="/formulario">List of products</a></li>
+        </ul>
+    </nav> -->
+    

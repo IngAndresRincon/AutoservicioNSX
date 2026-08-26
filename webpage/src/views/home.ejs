@@ -1,0 +1,390 @@
+<%- include('partials/head') %>
+
+<div class="d-flex">
+  <!-- Sidebar -->
+  <div class="sidebar" >
+    <div class="mb-4" style="cursor: pointer;text-align: center;">
+      <strong><i class="bi bi-list"></i> INSEPET</strong>
+    </div>
+
+     <div id="menuContent" >
+
+    <a href="#" class="nav-link" onclick="cargarModulo('autorizaciones')">
+          <img src="/icons/bootstrap-icons/clipboard-check-fill.svg"  class="icon-white" alt="Autorizaciones" /> Autorizaciones
+        </a>
+
+        <a href="#" class="nav-link" onclick="cargarModulo('programaciones')">
+          <img src="/icons/bootstrap-icons/calendar-event-fill.svg"  class="icon-white" alt="Programaciones" /> Programaciones
+        </a>
+
+        <!-- <a href="#" class="nav-link" onclick="cargarModulo('usuarios')">
+          <img src="/icons/bootstrap-icons/person-fill.svg" class="icon-white" alt="Usuarios" /> Usuarios
+        </a> -->
+
+        <a href="#" class="nav-link" onclick="cargarModulo('ventas')">
+          <img src="/icons/bootstrap-icons/credit-card-fill.svg"  class="icon-white"alt="Ventas" /> Ventas
+        </a>
+
+
+        <a href="#" class="nav-link" onclick="cargarModulo('reportespagos')">
+          <img src="/icons/bootstrap-icons/file-earmark-bar-graph-fill.svg"  class="icon-white"alt="Ventas" /> Reporte Pagos
+        </a>
+
+        
+        <a href="#" class="nav-link" onclick="cargarModulo('arqueo')">
+          <img src="/icons/bootstrap-icons/cash-stack.svg"  class="icon-white"alt="Ventas" /> Arqueo
+        </a>
+
+
+        <a href="#" class="nav-link" onclick="cargarModulo('transferencia')">
+          <img src="/icons/bootstrap-icons/cash-coin.svg"  class="icon-white"alt="Ventas" /> Transferencia Saldos
+        </a>
+
+
+          <p id="idposicion" style="padding: 0; font-size: 7px; text-align: center; display: none;"> 
+            <%= idposicion %></p>
+
+      </div>
+
+
+   
+  </div>
+
+  <!-- Main content -->
+  <div style="width: 80%;">
+    <div class="topbar" >
+      <!-- <div class="row" style="width: 100%;">
+        <div class=" col col-lg-12">
+          <button class="btn btn-primary"><img src="/icons/bootstrap-icons/justify.svg"  class="icon-white" /></button>
+          
+        </div>
+      </div> -->
+      <!-- <a href="/?id="+<%= idposicion %>>Salir</a> -->
+    </div>
+
+    <div id="content">
+  <!-- Contenido dinámico -->
+      <div class="content" id="contenidoDinamico">
+          <h2>Bienvenido, <%= usuario %>!</h2>
+          <p>Selecciona una opción del menú para comenzar.</p>
+          <!-- <button class="btn btn-success" >Autorizar</button> -->
+
+      </div>
+
+
+
+        <form class="row" id="formReportePayment" style="display: flex !important; margin: auto ;padding:10px;">
+          <div class="col-md-4">
+            <label for="fechaInicial" class="form-label">Fecha y Hora Inicial</label>
+            <input type="datetime-local" class="form-control" id="fechaInicial" required>
+          </div>
+          <div class="col-md-4">
+            <label for="fechaFinal" class="form-label">Fecha y Hora Final</label>
+            <input type="datetime-local" class="form-control" id="fechaFinal" required>
+          </div>
+          <div class="col-md-4">
+            <label for="metodoPago" class="form-label">Método de Pago</label>
+            <select id="metodoPago" class="form-select" required>
+              <option value="">Seleccione...</option>
+              <option value="1"> Nequi</option>
+              <option value="2"> Commodo</option>
+              <option value="3"> Datafono</option>
+              <option value="4"> Calibración</option>
+            </select>
+          </div>
+          <div class="col-12" style="margin-top: 5px;">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+          </div>
+        </form>
+        <div id="resultadoReporte" class="mt-6" style="display: flex !important; margin: auto ;padding:10px;"></div>
+
+         <form class="row" id="formReporteSale" style="display: flex !important; margin: auto ;padding:10px;">
+          <div class="col-md-6">
+            <label for="fechaInicial" class="form-label">Fecha y Hora Inicial</label>
+            <input type="datetime-local" class="form-control" id="fechaInicial" required>
+          </div>
+          <div class="col-md-6">
+            <label for="fechaFinal" class="form-label">Fecha y Hora Final</label>
+            <input type="datetime-local" class="form-control" id="fechaFinal" required>
+          </div>
+        
+          <div class="col-12" style="margin-top: 5px;">
+            <button type="submit" class="btn btn-primary">Buscar</button>
+          </div>
+        </form>
+        <div id="resultadoReporteSale" class="mt-6" style="display: flex !important; margin: auto ;padding:10px;"></div>
+
+
+
+          <div class="row" style="display: none; margin: auto; text-align: center;" id="spinnerloading" >
+              <div class="spinner-border text-primary" role="status" >
+              <span class="visually-hidden">Loading...</span></div>
+              <p>Cargando...</p>
+          </div>
+
+
+      
+
+
+    </div>
+
+
+    
+  </div>
+</div>
+
+
+
+
+
+
+<!-- Modal cancelar autorización-->
+
+
+
+
+<div class="modal fade" id="modalCancelarAutorizacion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modalLabel">Cancelar autorización</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+         <div class="row">
+           <div class="col-xl-12">
+              <h5 style="text-align: center;">¿ Seguro que desea cancelar la autorización 
+              <strong id="idautorizacioncancelar"></strong>? ¡no se podra realizar el despacho de combustible!.</h5> 
+            </div>
+            <hr style="margin: 10px 0 10px 0;">
+         
+            <div class="col col-lg-12" style="display: flex;">
+              <div class="col col-lg-6" style="padding: 0 10px 0 10px;">
+                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="width: 100%;">Cancelar</button>
+              </div>
+              <div class="col col-lg-6" style="padding: 0 10px 0 10px;">
+                <button type="button" class="btn btn-primary" style="width: 100%;" onclick="anularautorizacion()">Confirmar</button>
+              </div>             
+            </div>
+        </div>
+        
+      </div>
+      <!-- <div class="modal-footer">
+     
+      </div> -->
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+<!-- Modal liberación de saldo-->
+
+
+
+<div class="modal fade" id="modalLiberarSaldo"  data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modalLabel">Liberar saldo</h5>
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button> -->
+      </div>
+      <div class="modal-body">
+         <div class="row">
+           <div class="col-xl-12">
+              <h5 style="text-align: center;">Verifique la información de la devolución
+                <!-- <strong id="modalIdAutorizacion"></strong> -->
+              </h5> 
+            </div>
+            <hr style="margin: 10px 0 10px 0;">
+            <div class="col col-lg-12">
+              <label for="logincode">Número de contacto</label>
+               <input type="number" class="form-control" id="telefonotransferencia" placeholder="Número de contacto" maxlength="10" minlength="10">
+            </div>
+            <div class="col col-lg-12">
+              <label for="logincode">Saldo</label>
+               <input type="text" class="form-control" id="saldotransferencia" placeholder="Saldo" readonly="true">
+            </div>
+
+
+          <div class="col col-lg-12">
+            <label for="billeteradestino" class="form-label">Billetera  destino</label>
+            <select id="billeteradestino" class="form-select" required>
+              <option value="0">Seleccione...</option>
+              <option value="1"> Nequi</option>
+              <option value="2"> Commodo</option>
+            </select>
+          </div>
+
+
+            <br>
+            <div class="col-xl-12">
+              <label for="logincode">Código de ingreso</label>
+               <input type="text" class="form-control" id="logincodeBalance" placeholder="Código">
+            </div>
+           
+        </div>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" onclick="enviarLiberacionSaldo()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<!-- Modal Confirmar Autorizacion-->
+
+
+
+<div class="modal fade" id="modalloadingcode" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modalLabel">Código de seguridad</h5>       
+      </div>
+      <div class="modal-body">
+         <div class="row">
+           <div class="col-xl-12">
+              <h5 style="text-align: center;">Por favor espere hasta que se envíe el código de seguridad para continuar el proceso </h5> 
+            </div>
+            <div class="col-xl-12" style="text-align: center;">
+            <div class="spinner-border text-secondary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            </div>          
+           
+        </div>
+        
+      </div>
+     
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="modalConfirmarAutorizacion" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modalLabel">Confirmar Programación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+         <div class="row">
+           <div class="col-xl-12">
+              <h5 style="text-align: center;">Por favor confirme la información para autorizar el despacho de la programación <strong id="modalIdAutorizacion"></strong></h5> 
+            </div>
+            <hr style="margin: 10px 0 10px 0;">
+            <div class="col-xl-12">
+               <label for="metodoPago" class="form-label">Seleccione la forma de pago de esta programación</label>
+                <select id="formapagoprogramacion" class="form-select" required>
+                  <option value="0">Seleccione...</option>
+                  <option value="1"> Nequi</option>
+                  <option value="2"> Commodo</option>
+                  <option value="3"> Credibanco</option>
+                  <!-- <option value="5"> Calibración</option> -->
+                  <option value="6"> Redeban</option>
+                </select>
+            </div>
+             <div class="col-xl-12">
+               <label for="referencia" class="form-label">Motivo por el cuál se autoriza esta programación</label>
+                <select id="referencia" class="form-select" required>
+                  <option value="0">Seleccione...</option>
+                  <option value="1"> El cliente realizó el pago, pero el sistema no autorizó</option>
+                  <option value="2"> El equipo generó un error</option>
+                  <option value="3"> Equipo se detuvo antes de terminar el tanqueo, se despacha el valor faltante.</option>
+                 
+                </select>
+            </div>
+            <br>
+            <div class="col-xl-12">
+              <label for="logincode">Código de ingreso</label>
+               <input type="text" class="form-control" id="logincodeAuthorization" placeholder="Código">
+            </div>
+           
+        </div>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" onclick="enviarConfirmacionAutorizacion()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Modal Cambiar Producto-->
+
+
+<div class="modal fade" id="modalCambioProducto" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modalLabel">Cambiar producto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="col-xl-12" style="text-align: center;">
+                <h5>Escoja el producto que desea asignar a la autorización: 
+                  <strong id="idautorizacion"></strong>
+                </h5>
+            </div>
+             <hr style="margin: 10px 0 10px 0;">
+           
+            <div class="col-xl-12" id="ddlproductocontent">
+            </div>
+            <div class="col-xl-12">
+              <label for="logincode">Código de ingreso</label>
+               <input type="number" class="form-control" id="logincodecp" placeholder="Código">
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-success" onclick="confirmacambioproducto()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+<!-- Modal Información Pago-->
+ <div class="modal fade" id="modalpayment" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modalLabel">Pagos Autorización</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" id="bodylistpayment">
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../public/js/dashboard.js"></script>
+
+<%- include('partials/footer') %>

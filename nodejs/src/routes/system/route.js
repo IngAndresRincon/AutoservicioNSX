@@ -7,5 +7,6 @@ router.get("/", controller.root);
 router.post("/upload-video", controller.uploadVideoMiddleware, controller.uploadVideo);
 router.patch("/synchronize-module", controller.synchronizeModule);
 router.post("/synchronize-screen", controller.synchronizeScreen);
+router.post("/print-code", controller.printcode);
 
 module.exports = router;

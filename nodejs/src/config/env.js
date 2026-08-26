@@ -12,6 +12,8 @@ const env = {
   apiKeys: process.env.API_KEYS ? process.env.API_KEYS.split(",").map((key) => key.trim()).filter(Boolean) : [],
   ioApiKey: process.env.IO_API_KEY || "",
   jwtSecret: process.env.JWT_SECRET || "",
+  printerip: process.env.PRINTER_IP,
+  printerport:process.env.PRINTER_PORT,
   db: {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,

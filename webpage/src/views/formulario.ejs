@@ -1,0 +1,22 @@
+<%- include('partials/head') %>
+
+<h1>Registro de Usuario</h1>
+
+<form action="/formulario" method="POST">
+  <label for="nombre">Nombre:</label><br>
+  <input type="text" id="nombre" name="nombre" required><br><br>
+
+  <label for="correo">Correo:</label><br>
+  <input type="email" id="correo" name="correo" required><br><br>
+
+  <label for="pais">País:</label><br>
+  <select name="pais" id="pais" required>
+    <% paises.forEach(pais => { %>
+      <option value="<%= pais %>"><%= pais %></option>
+    <% }); %>
+  </select><br><br>
+
+  <button type="submit">Registrar</button>
+</form>
+
+<%- include('partials/footer') %>

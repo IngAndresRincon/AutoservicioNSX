@@ -1,0 +1,114 @@
+/* Colores */
+:root {
+  --bg-sidebar: #3d1975;
+  --hover-sidebar: #4b2190;
+  --text-white: #ffffff;
+  --text-muted: #cccccc;
+}
+
+/* form .form-label {
+  font-weight: 500;
+}
+
+#resultadoReporte {
+  font-size: 1rem;
+} */
+
+/* Sidebar colapsado */
+.sidebar.collapsed {
+  width: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Expandir el contenido dinámico cuando el menú está oculto */
+.main-content {
+  flex-grow: 1;
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar-toggle-btn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: var(--bg-sidebar);
+  color: white;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 5px;
+  z-index: 999;
+}
+
+
+.sidebar {
+  transition: width 0.3s ease;
+}
+
+.icon-white {
+  filter: invert(100%);
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-right: 8px;
+}
+
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f4f4;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.sidebar {
+  background-color: var(--bg-sidebar);
+  color: var(--text-white);
+  width: 250px;
+  min-height: 100vh;
+  padding: 1rem;
+  transition: width 0.3s ease;
+}
+
+.sidebar h2 {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+}
+.sidebar .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  color: var(--text-white);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.sidebar .nav-link:hover {
+  background-color: var(--hover-sidebar);
+}
+
+.sidebar .nav-link img {
+  width: 20px;
+  margin-right: 12px;
+}
+
+.topbar {
+  background-color: var(--bg-sidebar);
+  color: var(--text-white);
+  padding: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.topbar a {
+  color: var(--text-white);
+  text-decoration: none;
+  margin-left: 1rem;
+}
+
+#contenidoDinamico {
+  padding: 2rem;
+}

@@ -6,6 +6,22 @@ const path = require("path");
 const multer = require("multer");
 const { randomUUID } = require("crypto");
 
+let bodyPrint = [
+  {Align: "center",text: "----------------------------------------",Bold: true,Style: "0x00",},
+  {Align: "center",text: "Conserve su codigo",Bold: true,Style: "0x00",},
+  {Align: "center",text: "hasta que",Bold: true,Style: "0x00",},
+  {Align: "center",text: "finalice la transaccion",Bold: true,Style: "0x00",},
+  {Align: "center",text: "----------------------------------------",Bold: true,Style: "0x00",},
+  {Align: "center",text: "",Bold: true,Style: "0x00",},
+  {Align: "center", text: "Codigo", Bold: true, Style: "0x00" },
+  {Align: "center", text: "", Bold: true, Style: "0x00" },
+  {Align: "center", text: "2025/6/9 16:2:57", Bold: true, Style: "0x00" },
+  {Align: "center",text: "",Bold: true,Style: "0x00",},
+  {Align: "center",text: "",Bold: true,Style: "0x00",},
+  {Align: "center",text: "",Bold: true,Style: "0x00",},
+  {Align: "center",text: "",Bold: true,Style: "0x00",},
+];
+
 const VIDEO_DIR = path.join(__dirname, "../../../public/video");
 const MEDIA_VIDEO_PREFIX = "/mediav";
 const MIME_EXTENSION_MAP = {
@@ -39,7 +55,9 @@ const buildStoredFileName = ({ requestedName, originalName, mimeType }) => {
   const safeOriginalName = sanitizeFileName(originalName || "video");
   const baseName = safeRequestedName || safeOriginalName;
   const parsedName = path.parse(baseName).name || "video";
-  const extension = path.extname(baseName) || getExtension(baseName, mimeType || safeOriginalName);
+  const extension =
+    path.extname(baseName) ||
+    getExtension(baseName, mimeType || safeOriginalName);
 
   return `${parsedName}${extension}`;
 };
@@ -62,7 +80,7 @@ const storage = multer.diskStorage({
       const safeOriginalName = sanitizeFileName(file.originalname || "video");
       const tempName = `${Date.now()}-${randomUUID()}${getExtension(
         safeOriginalName,
-        file.mimetype
+        file.mimetype,
       )}`;
       cb(null, tempName);
     } catch (error) {
@@ -85,7 +103,12 @@ const saveVideoFromRequest = async (req) => {
     throw new AppError("No se recibio ningun archivo de video", 400);
   }
 
-  const requestedName = req.headers?.["x-video-name"] || req.body?.videoName || req.body?.filename || req.body?.name || "";
+  const requestedName =
+    req.headers?.["x-video-name"] ||
+    req.body?.videoName ||
+    req.body?.filename ||
+    req.body?.name ||
+    "";
   const safeOriginalName = sanitizeFileName(req.file.originalname || "video");
   const mimeType = String(req.file.mimetype || "").toLowerCase();
   const storedName = buildStoredFileName({
@@ -136,16 +159,21 @@ exports.root = async (req, res, next) => {
 exports.uploadVideo = async (req, res, next) => {
   try {
     const file = await saveVideoFromRequest(req);
-    if(file){
+    if (file) {
       const route = req.body.route;
-      const bodyRoute = route == 'standby' ? {
-                                      "standby_video": "prueba.mp4"
-                                    } :route == 'dispensing' ? {
-                                      "dispensing_video": "video.mp4"
-                                    } : {
-                                      "standby_video": "prueba.mp4",
-                                      "dispensing_video": "video.mp4"
-                                    }
+      const bodyRoute =
+        route == "standby"
+          ? {
+              standby_video: "prueba.mp4",
+            }
+          : route == "dispensing"
+            ? {
+                dispensing_video: "video.mp4",
+              }
+            : {
+                standby_video: "prueba.mp4",
+                dispensing_video: "video.mp4",
+              };
       serviceSystem.updateVideoRoute(bodyRoute);
     }
 
@@ -197,3 +225,43 @@ exports.synchronizeScreen = async (req, res, next) => {
     return next(error);
   }
 };
+
+exports.printcode = async (req, res, next) => {
+  try {
+    const { code } = req.body;
+
+    const  currentDate = getFechaHoraColombia();
+    bodyPrint[7].text = `------ ${code} ------`;
+    bodyPrint[8].text = currentDate;
+
+    console.log(JSON.stringify(bodyPrint));
+
+    const response = await serviceSystem.printcode(bodyPrint);
+
+    return res.status(200).json({
+      isError: false,
+      message: "Impresión enviada",
+      content: response,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+
+function getFechaHoraColombia() {
+    const fecha = new Date();
+
+    const partes = new Intl.DateTimeFormat("sv-SE", {
+        timeZone: "America/Bogota",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false
+    }).format(fecha);
+
+    return partes.replace(" ", " ");
+}
