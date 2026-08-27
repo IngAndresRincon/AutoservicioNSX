@@ -228,18 +228,18 @@ exports.synchronizeScreen = async (req, res, next) => {
 
 exports.printcode = async (req, res, next) => {
   try {
-    const { code } = req.body;
+    const { positionId,code } = req.body;
 
     const  currentDate = getFechaHoraColombia();
     bodyPrint[7].text = `------ ${code} ------`;
     bodyPrint[8].text = currentDate;
 
-    console.log(JSON.stringify(bodyPrint));
+    const posId = parseInt(positionId??0);
 
-    const response = await serviceSystem.printcode(bodyPrint);
+    const response = await serviceSystem.printcode(posId,bodyPrint);
 
-    return res.status(200).json({
-      isError: false,
+    return res.status(response?200:404).json({
+      isError: response?false:true,
       message: "Impresión enviada",
       content: response,
     });

@@ -43,3 +43,10 @@ exports.getScreenList = async () => {
     throw new AppError(`Error obteniendo lista de pantallas: ${error.message}`, 502);   
   }
 };
+
+
+exports.findPrinterConfiguration = async (posId)=>{
+  const query = `SELECT * FROM public.impresora_posicion WHERE id_posicion = $1 LIMIT 1;`;
+  const result = await client.query(query,[posId]);
+  return result.rowCount>0? result.rows[0] : null;
+}
