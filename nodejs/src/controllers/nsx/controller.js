@@ -152,3 +152,37 @@ exports.getStatusPosition = async (req, res, next) => {
 };
 
 
+
+
+exports.fidelity = async (req, res, next) => {
+  try {
+    const payload = req.body;
+
+    const response = await nsxService.fidelity(payload);
+    return res.status(200).json({
+      isError: false,
+      message: "Fidelidad reportada correctamente",
+      content: response,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+
+
+exports.validateCustomer = async (req, res, next) => {
+  try {
+    const payload = req.body;
+
+    const response = await nsxService.validateCustomer(payload);
+    return res.status(200).json({
+      isError: false,
+      message: "Informacion del cliente consultada",
+      content: response,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+

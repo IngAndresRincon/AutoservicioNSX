@@ -38,3 +38,10 @@ exports.saveRecordReturnBalanceNequi = async (id,item) =>{
     throw new AppError("Error validando preset NSX", 502, { details: error.message });
   }
 }
+
+
+exports.findModuleIdentifier = async () => {
+  const query = "SELECT * FROM public.modulo WHERE activo = $1 LIMIT 1;";
+  const result = await client.query(query, [true]);
+  return result.rowCount>0? result.rows[0] : null;
+}

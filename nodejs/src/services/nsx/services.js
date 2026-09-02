@@ -101,3 +101,55 @@ exports.getStatusPosition = async (position) => {
   const response = await getJson(endpoint);
   return ensureResponseOk(response, "No hay informacion encontrada para la solicitud");
 };
+
+
+exports.fidelity = async (payload) => {
+  const endpoint = `${apiNsx}/Fidelidad/Acumular`;
+
+  const identifier =await nsxRepository.findModuleIdentifier();
+
+
+  if(!identifier){
+    throw new AppError("No se encuentra el identificador del módulo", 404);
+  }
+
+  const body ={
+    "identificador": identifier.identificador,
+    "idTipoFidelidad": payload.fidelityTypeId,
+    "idVenta": payload.saleId,
+    "tipoDocumento": payload.documentType,
+    "documento": payload.documentNumber,
+  }
+
+
+   const response = await postJson(endpoint, body);
+   return ensureResponseOk(response, "No hay informacion encontrada para la solicitud");
+}
+
+
+
+
+
+exports.validateCustomer = async (payload) => {
+  const endpoint = `${apiNsx}/Fidelidad/ValidarCliente`;
+
+  const identifier =await nsxRepository.findModuleIdentifier();
+
+
+  if(!identifier){
+    throw new AppError("No se encuentra el identificador del módulo", 404);
+  }
+
+  const body ={
+    "identificador": identifier.identificador,
+    "idTipoFidelidad": payload.fidelityTypeId,
+    "idVenta": payload.saleId,
+    "tipoDocumento": payload.documentType,
+    "documento": payload.documentNumber,
+  }
+
+
+   const response = await postJson(endpoint, body);
+   return ensureResponseOk(response, "No hay informacion encontrada para la solicitud");
+}
+
