@@ -24,7 +24,7 @@ exports.updateReturnBalanceState = async (id, estado,message) => {
   let sync = false;
   try {
     const query = `UPDATE public.devolucion_saldo
-                    SET estado = $1, respuestas = $2
+                    SET estado = $1, respuesta = $2
                     WHERE id = $3;`;
     const response = await client.query(query, [estado, message??'',id]);
     if (response.rowCount > 0) {

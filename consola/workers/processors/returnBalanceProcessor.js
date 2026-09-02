@@ -30,9 +30,11 @@ async function processReturnBalance() {
 
     for (const item of pending) {
       const body = buildReturnBalanceBody(item);
+      console.log(`Enviando devolución de saldo ${JSON.stringify(item)} a NSX:`, JSON.stringify(body));
 
       try {
         const response = await service.registerReturnBalanceNSX(body);
+        console.log(`Respuesta de NSX para devolución de saldo ${item.id}:`, response);
         if(response == undefined) return;
         console.log(response.data??'No hay respuestas del servidor NSX');
         if (response.status === 200) {

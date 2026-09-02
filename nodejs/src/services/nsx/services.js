@@ -53,20 +53,26 @@ exports.generateChange = async (request) => {
   if(!methodPayment){
     throw new AppError("No hay información del método de pago asociado", 404);
   }
+  console.log(`Datos de preset: ${JSON.stringify(existPreset)}, Datos de método de pago: ${JSON.stringify(methodPayment)}`);
 
-  if(methodPayment.id_nsx_forma_pago === 25){
+  if(methodPayment.id === 2){
     const result = await nsxRepository.saveRecordReturnBalanceNequi(existPreset.id,request);
+    console.log(`Resultado de guardar registro de devolución de saldo: ${JSON.stringify(result)}`);
     return result;
   }
 
-  const endpoint = `${apiNsx}/Vueltos/GenerarVuelto`;
   const body = {
     idPreset: request.presetId,
     valor: request.amount,
     idFormaPago: request.methodPaymentId,
   };
+  console.log(`Solicitud para generar vuelto: ${JSON.stringify(body)}`);
+
+  const endpoint = `${apiNsx}/Vueltos/GenerarVuelto`;
+
 
   const response = await postJson(endpoint, body);
+  console.log(`Respuesta de la API NSX al generar vuelto: ${JSON.stringify(response)}`);
   return ensureResponseOk(response, "No hay informacion encontrada para la solicitud");
 };
 
