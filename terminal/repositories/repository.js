@@ -72,3 +72,13 @@ exports.changeStatusPayment = async (id,status,response ) => {
 
   return isUpdate;
 };
+
+
+
+exports.authorizePayment = async (payment,statusId) => {
+  console.log("Authorize payment:", payment);
+  const query = `UPDATE public.transaccion_pago SET id_estado_transaccion = $1 WHERE id = $2;`;
+  const result = await client.query(query, [statusId, payment.idtransaccionpago]);
+  console.log("Authorize payment result:", result);
+  return result.rowCount > 0? result.rows[0]: null;
+}

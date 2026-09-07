@@ -10,14 +10,19 @@ exports.mapping = async (req, res, next) => {
     }
 
     const stationData = await mappingService.getStationData();
+    console.log("stationData", stationData);
     const listproducthose = await mappingService.producthoses(Number(screenid));
+    console.log("listproducthose", listproducthose);
     const listmethodpayment = await mappingService.methodpayment();
+    console.log("listmethodpayment", listmethodpayment);
     const listspeeddial = await mappingService.speeddial();
+    console.log("listspeeddial", listspeeddial);
     const listFidelity = await mappingService.fidelity();
+    console.log("listFidelity", listFidelity);
 
-    if (!listproducthose.length || !listmethodpayment.length || !listspeeddial.length) {
-      throw new AppError("No hay informacion de mapeo", 404);
-    }
+    // if (!listproducthose.length || !listmethodpayment.length || !listspeeddial.length) {
+    //   throw new AppError("No hay informacion de mapeo", 404);
+    // }
 
     return res.status(200).json({
       isError: false,

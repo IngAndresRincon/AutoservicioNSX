@@ -152,3 +152,12 @@ exports.get = async (endpoint) => {
   }
   return response;
 };
+
+
+
+exports.authorizePayment = async (payment) => {
+  await repository.authorizePayment(payment,4);
+  await new Promise((resolve) => setTimeout(resolve, 5000)); // Esperar 5 segundos
+  await repository.authorizePayment(payment,2);
+  return true;
+}
