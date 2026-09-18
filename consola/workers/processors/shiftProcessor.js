@@ -30,11 +30,11 @@ exports.processShifts = async () => {
     if(!availableShift) return;
 
     if(availableShift.activo){
-
+        
         const dateValidity = await repository.dateValidity(currentDate);
         if(!dateValidity){
             //Cerrar turno y abrir uno nuevo
-            const shiftClose = await repository.getShiftToClose();
+            const shiftClose = await repository.getShiftToClose(availableShift.id);
             if(shiftClose){
                 logger.info(`Turno encontrado para cerrar  ${currentDate}`);
                 const resultCloseService = await closeShiftNsx(shiftClose);
@@ -45,9 +45,9 @@ exports.processShifts = async () => {
 
 
     if(!availableShift.activo){
-        const shiftClose = await repository.getShiftToClose();
+        const shiftClose = await repository.getShiftToClose(availableShift.id);
         if(shiftClose){
-            logger.info(`Turno encontrado para cerrar  ${currentTime}`);
+            logger.info(`Turno encontrado para cerrar  ${currentDate}`);
             const resultCloseService = await closeShiftNsx(shiftClose);
         };
         logger.info(`Turno encontrado para abrir  ${JSON.stringify(availableShift)}`);

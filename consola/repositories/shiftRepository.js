@@ -48,25 +48,29 @@ exports.getCurrentShiftAvailable = async (currentDate) => {
 
 
 
-exports.getShiftToClose = async () => {
+exports.getShiftToClose = async (shiftId) => {
 
-    const query = `SELECT * FROM public.turno 
-    WHERE activo = true AND disponible = true LIMIT 1;`;
-    const result = await client.query(query);
-    return result.rows[0] || null;
+    const query = `SELECT * FROM public.historico_turno 
+                    WHERE id = (
+                        SELECT MAX(id) FROM public.historico_turno WHERE activo = $1
+                    );`;
+    const result = await client.query(query,[true]);
+    return result.rowCount>0? result.rows[0] : null;
   
 };
 
 
 exports.closeShift = async (shiftId) => {
 
-    const query0 = `UPDATE public.historico_turno SET activo = false, 
+    const query0 = `UPDATE public.historico_turno SET activo = $1, 
     fecha_final = (SELECT now() AT TIME ZONE 'America/Bogota')
-    WHERE id_turno = $1 AND activo = true;`;
-    const result0 = await client.query(query0, [shiftId]);
+    WHERE id = $2 AND activo = $3 RETURNING *;`;
+    const result0 = await client.query(query0, [false, shiftId,true]);
+
+    const id = result0.rowCount>0 ? result0.rows[0].fk_id_turno : 0;
 
     const query1 = `UPDATE public.turno SET activo = false WHERE id = $1`;
-    const result1 = await client.query(query1, [shiftId]);
+    const result1 = await client.query(query1, [id]);
     return result1.rowCount>0? result1.rows[0]:null;
 }
 
@@ -77,16 +81,16 @@ exports.openShift = async (shift, nsxShift) => {
     const result0 =await client.query(query0, [shift.id]);
 
     const query1 = `UPDATE public.turno SET 
-    activo = true,
-    fecha_turno_inicial = $1,
-    fecha_turno_final = $2,
+    activo = $1,
+    fecha_turno_inicial = $2,
+    fecha_turno_final = $3,
     fecha_registro = now(),
-    id_turno_nsx = $3
-    WHERE id = $4 RETURNING *;`;
+    id_turno_nsx = $4
+    WHERE id = $5 RETURNING *;`;
 
-    const result1 = await client.query(query1, [shift.fecha_inicial,shift.fecha_final,nsxShift.idTurno,shift.id]);
-    
+    const result1 = await client.query(query1, [true,shift.fecha_inicial,shift.fecha_final,nsxShift.idTurno,shift.id]);
     return result1.rowCount>0 ?result1.rows[0] :null;
+
 };
 
 
