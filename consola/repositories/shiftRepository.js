@@ -62,15 +62,18 @@ exports.getShiftToClose = async (shiftId) => {
 
 exports.closeShift = async (shiftId) => {
 
+    console.log(`Turno local para cerrar ${shiftId}`);
+
     const query0 = `UPDATE public.historico_turno SET activo = $1, 
     fecha_final = (SELECT now() AT TIME ZONE 'America/Bogota')
     WHERE id = $2 AND activo = $3 RETURNING *;`;
     const result0 = await client.query(query0, [false, shiftId,true]);
+    console.log(`Respuesta cierre histórico ${JSON.stringify(result0.rows)}`);
+    const id = result0.rowCount>0 ? result0.rows[0].id_turno : 0;
 
-    const id = result0.rowCount>0 ? result0.rows[0].fk_id_turno : 0;
-
-    const query1 = `UPDATE public.turno SET activo = false WHERE id = $1`;
+    const query1 = `UPDATE public.turno SET activo = false WHERE id = $1 RETURNING *;`;
     const result1 = await client.query(query1, [id]);
+    console.log(`Respuesta cierre turno ${JSON.stringify(result1.rows)}`);
     return result1.rowCount>0? result1.rows[0]:null;
 }
 
