@@ -204,7 +204,9 @@ exports.pendingAuthorization = async (userId) => {
       FROM public.programacion as p
       INNER JOIN public.autorizacion as a ON p.id = a.id_programacion
       INNER JOIN public.estado as e ON a.sincronizado = e.codigo
-      WHERE a.sincronizado in (6,3) AND p.id_cliente = $1
+      WHERE a.sincronizado in (6,3) 
+      AND p.id_cliente = $1,
+      AND (a.fecha_registro > NOW() - INTERVAL '30 minutes')
       LIMIT 1;`;
     const res0 = await client.query(query, [userId]);
     return res0.rowCount === 0 ? null : res0.rows[0];
