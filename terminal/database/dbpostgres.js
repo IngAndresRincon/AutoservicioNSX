@@ -1,16 +1,13 @@
-
-
 const { Pool } = require('pg');
+const {env} = require('../config/env');
 
-const stringConnection ={
-	user: 'postgres',
-	password: 'admin',
-	host: '100.103.140.20',
-	port: '5432',
-	database: 'Autoservicio_nsx2',
-};
+const pool = new Pool({
+  user: env.db.user,
+  password: env.db.password,
+  host: env.db.host,
+  port: env.db.port,
+  database: env.db.database,
+  ssl: env.db.ssl ? { rejectUnauthorized: false } : false
+});
 
-const client = new Pool(stringConnection);
-
-
-module.exports = {client,stringConnection};
+module.exports = pool;

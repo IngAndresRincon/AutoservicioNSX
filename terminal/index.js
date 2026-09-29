@@ -11,9 +11,9 @@ async function startConsole() {
 
   
   await loadTerminalConfig();
-  // startProcessPaymentTerminal();
-  // startProcessResponseTerminal();
-  startAutomaticPayment();
+  startProcessPaymentTerminal();
+  startProcessResponseTerminal();
+  //startAutomaticPayment();
 }
 
 

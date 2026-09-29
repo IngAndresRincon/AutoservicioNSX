@@ -1,12 +1,9 @@
-const { client } = require("../database/dbpostgres");
+const pool = require("../database/dbpostgres");
 require("dotenv").config();
-
-
+const validTransactionStatusId = [2, 4];
 
 exports.getTerminalList = async () => {
-  let list = [];
-  try {
-    let query = `SELECT tp.id as idterminalposicion, id_terminal, id_posicion,
+  const query = `SELECT tp.id as idterminalposicion, id_terminal, id_posicion,
                         t.id as idterminal,
                         t.serial, t.ip,
                         p.id as idposicion,
@@ -17,24 +14,12 @@ exports.getTerminalList = async () => {
                         INNER JOIN public.posicion as p
                         ON p.id = tp.id_posicion
                 WHERE tp.activo = true AND p.activo = true AND t.activo = true`;
-    const res0 = await client.query(query);
-    if (res0.rowCount > 0) {
-      list = res0.rows;
-    }
-  } catch (e) {
-    console.error(e.message);
-    throw new Error("Error:" + e.message);
-  }
-
-  return list;
+  const result = await pool.query(query);
+  return result.rowCount > 0 ? result.rows : [];
 };
 
-
-
-exports.getPendingPayment = async (params,statusid) => {
-  let itemPayment = null;
-  try {
-    let query = `SELECT 
+exports.getPendingPayment = async (params, statusid) => {
+  const query = `SELECT 
                     tp.id as idtransaccionpago,
                     p.id as idprogramacion,
                     p.valor_programado as totalmonto,
@@ -44,41 +29,30 @@ exports.getPendingPayment = async (params,statusid) => {
                     FROM  public.transaccion_pago as tp
                     INNER JOIN public.programacion as p
                     ON tp.id_programacion = p.id 
-                WHERE id_forma_pago = 1 AND id_estado_transaccion = ${statusid} AND p.posicion_id = ${params.id_posicion} LIMIT 1`;
-    const res0 = await client.query(query);
-    if (res0.rowCount > 0) {
-      itemPayment = res0.rows[0];
-    }
-  } catch (e) {
-    console.error(e.message);
-    throw new Error("Error:" + e.message);
-  }
-
-  return itemPayment;
+                WHERE id_forma_pago = 1 
+                AND id_estado_transaccion = $1
+                AND p.posicion_id = $2 LIMIT 1`;
+  const result = await pool.query(query, [statusid, params.id_posicion]);
+  return result.rowCount > 0 ? result.rows[0] : null;
 };
 
-exports.changeStatusPayment = async (id,status,response ) => {
-  let isUpdate = false;
-  try {
-        let query = `UPDATE public.transaccion_pago SET id_estado_transaccion = ${status}, respuesta_pago = '${response}' WHERE id = ${id};`;
-        const res0 = await client.query(query);
-        if (res0.rowCount > 0) {
-            isUpdate = true;
-        }
-  } catch (e) {
-    console.error(e.message);
-    throw new Error("Error:" + e.message);
-  }
+exports.changeStatusPayment = async (id, status, response) => {
 
-  return isUpdate;
+  const query = `UPDATE public.transaccion_pago SET 
+                  id_estado_transaccion = $1,
+                  respuesta_pago = $2
+                WHERE id = $3 RETURNING *;`;
+  const result = await pool.query(query,[status,response,id]);
+  return result.rowCount>0? result.rows[0] : null;
+
 };
 
-
-
-exports.authorizePayment = async (payment,statusId) => {
+exports.authorizePayment = async (payment, statusId) => {
   console.log("Authorize payment:", payment);
-  const query = `UPDATE public.transaccion_pago SET id_estado_transaccion = $1 WHERE id = $2;`;
-  const result = await client.query(query, [statusId, payment.idtransaccionpago]);
+  const query = `UPDATE public.transaccion_pago SET 
+                  id_estado_transaccion = $1 
+                WHERE id = $2;`;
+  const result = await pool.query(query, [statusId, payment.idtransaccionpago]);
   console.log("Authorize payment result:", result);
-  return result.rowCount > 0? result.rows[0]: null;
-}
+  return result.rowCount > 0 ? result.rows[0] : null;
+};
