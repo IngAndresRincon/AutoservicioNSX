@@ -109,28 +109,37 @@ exports.getStatusPosition = async (position) => {
 };
 
 
-exports.fidelity = async (payload) => {
-  const endpoint = `${apiNsx}/Fidelidad/Acumular`;
-
-  const identifier =await nsxRepository.findModuleIdentifier();
-
-
-  if(!identifier){
+const buildFidelityBody = async (payload) => {
+  const identifier = await nsxRepository.findModuleIdentifier();
+  if (!identifier) {
     throw new AppError("No se encuentra el identificador del módulo", 404);
   }
 
-  const body ={
-    "identificador": identifier.identificador,
-    "idTipoFidelidad": payload.fidelityTypeId,
-    "idVenta": payload.saleId,
-    "tipoDocumento": payload.documentType,
-    "documento": payload.documentNumber,
+  const program = await nsxRepository.findFidelityProgram(payload.fidelityTypeId);
+  if (!program) {
+    throw new AppError("El programa de fidelidad no está habilitado en el módulo", 400);
   }
 
+  return {
+    identificador: identifier.identificador,
+    idTipoFidelidad: program.id_fidelidad_nsx,
+    idVenta: payload.saleId,
+    tipoDocumento: payload.documentType,
+    documento: payload.documentNumber,
+  };
+};
 
-   const response = await postJson(endpoint, body);
-   return ensureResponseOk(response, "No hay informacion encontrada para la solicitud");
-}
+exports.fidelity = async (payload) => {
+  const endpoint = `${apiNsx}/Fidelidad/Acumular`;
+  const body = await buildFidelityBody(payload);
+
+  if (payload.customerName) {
+    body.nombreCliente = payload.customerName;
+  }
+
+  const response = await postJson(endpoint, body);
+  return ensureResponseOk(response, "No hay informacion encontrada para la solicitud");
+};
 
 
 
@@ -138,24 +147,9 @@ exports.fidelity = async (payload) => {
 
 exports.validateCustomer = async (payload) => {
   const endpoint = `${apiNsx}/Fidelidad/ValidarCliente`;
+  const body = await buildFidelityBody(payload);
 
-  const identifier =await nsxRepository.findModuleIdentifier();
-
-
-  if(!identifier){
-    throw new AppError("No se encuentra el identificador del módulo", 404);
-  }
-
-  const body ={
-    "identificador": identifier.identificador,
-    "idTipoFidelidad": payload.fidelityTypeId,
-    "idVenta": payload.saleId,
-    "tipoDocumento": payload.documentType,
-    "documento": payload.documentNumber,
-  }
-
-
-   const response = await postJson(endpoint, body);
-   return ensureResponseOk(response, "No hay informacion encontrada para la solicitud");
-}
+  const response = await postJson(endpoint, body);
+  return ensureResponseOk(response, "No hay informacion encontrada para la solicitud");
+};
 

@@ -21,6 +21,14 @@ exports.speeddial = async () =>{
   return await mappingRepository.speeddial();
 }
 
+exports.identifiers = async () =>{
+  return await mappingRepository.identifiers();
+}
+
+exports.sellerPaymentMethods = async () =>{
+  return await mappingRepository.sellerPaymentMethods();
+}
+
 exports.fidelity = async () =>{
   return await mappingRepository.fidelity();
 }

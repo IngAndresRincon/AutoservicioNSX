@@ -5,6 +5,7 @@ module.exports = {
   product: require("./product/repository"),
   programming: require("./programming/repository"),
   sale: require("./sale/repository"),
+  seller: require("./seller/repository"),
   system: require("./system/repository"),
   terminal: require("./terminal/repository"),
 };

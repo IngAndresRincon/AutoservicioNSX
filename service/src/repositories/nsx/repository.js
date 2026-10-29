@@ -40,6 +40,12 @@ exports.saveRecordReturnBalanceNequi = async (id,item) =>{
 }
 
 
+exports.findFidelityProgram = async (nsxId) => {
+  const query = "SELECT id_fidelidad_nsx, fidelidad FROM public.fidelidad WHERE id_fidelidad_nsx = $1 LIMIT 1;";
+  const result = await client.query(query, [nsxId]);
+  return result.rows[0] || null;
+};
+
 exports.findModuleIdentifier = async () => {
   const query = "SELECT * FROM public.modulo WHERE activo = $1 LIMIT 1;";
   const result = await client.query(query, [true]);

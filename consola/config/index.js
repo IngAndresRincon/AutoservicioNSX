@@ -28,6 +28,7 @@ module.exports = {
     getPendingAuthIntervalMs: toInt(process.env.GET_PENDING_AUTH_INTERVAL_MS, 4000),
     syncModuleIntervalMs: toInt(process.env.SYNC_MODULE_INTERVAL_MS, 5000),
     shiftIntervalMs: toInt(process.env.SHIFT_INTERVAL_MS, 10000),
+    presetSellerIntervalMs: toInt(process.env.PRESET_SELLER_INTERVAL_MS, 3000),
     salePendingIntervalMs: toInt(process.env.SALE_PENDING_INTERVAL_MS, 200),
     saleSyncRetryDelayMs: toInt(process.env.SALE_SYNC_RETRY_DELAY_MS, 5000),
     saleSyncLoopIntervalMs: toInt(process.env.SALE_SYNC_LOOP_INTERVAL_MS, 10000),

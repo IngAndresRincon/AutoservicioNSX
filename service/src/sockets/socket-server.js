@@ -82,8 +82,16 @@ exports.initSocketServer = (server) => {
     logger.error("No fue posible iniciar el listener de PostgreSQL", error.message);
   });
 
+  // Al atrapar la señal Node ya no sale solo: hay que cerrar y terminar, o systemd espera 90 s y mata el proceso
   const shutdown = async () => {
-    await postgresNotifier.stop();
+    setTimeout(() => process.exit(0), 5000).unref();
+    try {
+      await postgresNotifier.stop();
+      io.close();
+      server.close();
+    } finally {
+      process.exit(0);
+    }
   };
 
   process.once("SIGINT", shutdown);

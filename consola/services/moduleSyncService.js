@@ -20,6 +20,8 @@ exports.syncModule = async () => {
     await repository.recordMethodPayment(params.formasPago);
     await repository.recordShift(params.estacion.turnos);
     await repository.recordFidelity(params.fidelidad);
+    await repository.recordIdentifiers(params.identificadores ?? []);
+    await repository.recordSellerPaymentMethods(params.formasPagoVendedor ?? []);
   }
 
   const _responseProducts = await exports.getAllProduct();

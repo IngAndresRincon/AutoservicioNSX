@@ -19,6 +19,8 @@ exports.mapping = async (req, res, next) => {
     console.log("listspeeddial", listspeeddial);
     const listFidelity = await mappingService.fidelity();
     console.log("listFidelity", listFidelity);
+    const listIdentifiers = await mappingService.identifiers();
+    const listSellerPaymentMethods = await mappingService.sellerPaymentMethods();
 
     // if (!listproducthose.length || !listmethodpayment.length || !listspeeddial.length) {
     //   throw new AppError("No hay informacion de mapeo", 404);
@@ -33,7 +35,9 @@ exports.mapping = async (req, res, next) => {
           productHoses: listproducthose,
           methodPayment: listmethodpayment,
           speedDial: listspeeddial,
-          fidelity: listFidelity
+          fidelity: listFidelity,
+          identifiers: listIdentifiers,
+          sellerPaymentMethods: listSellerPaymentMethods
         },
       },
     });

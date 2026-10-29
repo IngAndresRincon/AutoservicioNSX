@@ -6,6 +6,8 @@ const logger = require("../config/logger");
 const POSTGRES_CHANNELS = [
   "notify_event_transaction_payment",
   "notify_event_authorization",
+  "notify_event_preset_vendedor",
+  "notify_event_preset_cliente",
   "event_sale",
 ];
 

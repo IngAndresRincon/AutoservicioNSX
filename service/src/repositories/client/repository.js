@@ -60,3 +60,108 @@ exports.additionalInformation = async (params) => {
     throw new AppError("Error validando cliente", 502, { details: error.message });
   }
 };
+
+const fail = (message, error) => {
+  logger.error(message, error);
+  return new AppError(message, 502, { details: error.message });
+};
+
+exports.findPosition = async (positionId) => {
+  try {
+    const result = await client.query("SELECT id, id_nsx_posicion FROM public.posicion WHERE id = $1;", [positionId]);
+    return result.rows[0] || null;
+  } catch (error) {
+    throw fail("Error consultando la posicion", error);
+  }
+};
+
+exports.isIdentifierTypeEnabled = async (typeId) => {
+  try {
+    const result = await client.query(
+      "SELECT 1 FROM public.identificador_cliente WHERE id_nsx_identificador = $1;",
+      [typeId],
+    );
+    return result.rowCount > 0;
+  } catch (error) {
+    throw fail("Error consultando los identificadores", error);
+  }
+};
+
+// Reserva la posicion bajo un candado: no puede haber autoservicio, vendedor ni otro cliente identificado activos
+exports.reservePreset = async (params) => {
+  const db = await client.connect();
+  try {
+    await db.query("BEGIN");
+    await db.query("SELECT pg_advisory_xact_lock($1);", [params.positionId]);
+
+    const busy = await db.query(
+      `SELECT 'autoservicio' as origen FROM public.autorizacion
+         WHERE id_posicion = $1 AND sincronizado IN (0, 2, 8) AND id_venta IS NULL
+           AND fecha_registro > NOW() - INTERVAL '30 minutes'
+       UNION ALL
+       SELECT 'vendedor' FROM public.preset_vendedor
+         WHERE id_posicion = $1 AND sincronizado IN (0, 2, 8) AND id_venta IS NULL
+       UNION ALL
+       SELECT 'cliente' FROM public.preset_cliente
+         WHERE id_posicion = $1 AND sincronizado IN (0, 2, 8) AND id_venta IS NULL
+       LIMIT 1;`,
+      [params.positionId],
+    );
+    if (busy.rowCount > 0) {
+      throw new AppError(`La posicion esta ocupada (${busy.rows[0].origen})`, 409);
+    }
+
+    const result = await db.query(
+      `INSERT INTO public.preset_cliente
+         (id_posicion, numero_manguera, tipo_programacion, valor, km, tipo_identificador, serial, documento, id_turno_vendedor)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8::varchar,
+               (SELECT id FROM public.turno_vendedor WHERE documento = $8::varchar AND activo = true ORDER BY id DESC LIMIT 1))
+       RETURNING *;`,
+      [
+        params.positionId,
+        params.hoseNumber,
+        params.programmingType,
+        params.value,
+        params.km,
+        params.identifierType,
+        params.serial,
+        params.document,
+      ],
+    );
+
+    await db.query("COMMIT");
+    return result.rows[0];
+  } catch (error) {
+    await db.query("ROLLBACK");
+    if (error instanceof AppError) {
+      throw error;
+    }
+    throw fail("Error registrando el preset del cliente", error);
+  } finally {
+    db.release();
+  }
+};
+
+exports.updatePreset = async (id, { state, nsxPresetId = null, message = null }) => {
+  try {
+    const result = await client.query(
+      `UPDATE public.preset_cliente
+       SET sincronizado = $2, id_presetnsx = COALESCE($3, id_presetnsx), mensaje = $4, fecha_actualizacion = CURRENT_TIMESTAMP
+       WHERE id = $1
+       RETURNING *;`,
+      [id, state, nsxPresetId, message],
+    );
+    return result.rows[0] || null;
+  } catch (error) {
+    throw fail("Error actualizando el preset del cliente", error);
+  }
+};
+
+exports.getPreset = async (id) => {
+  try {
+    const result = await client.query("SELECT * FROM public.preset_cliente WHERE id = $1;", [id]);
+    return result.rows[0] || null;
+  } catch (error) {
+    throw fail("Error consultando el preset del cliente", error);
+  }
+};

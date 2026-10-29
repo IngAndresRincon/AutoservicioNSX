@@ -12,6 +12,9 @@ const env = {
   apiKeys: process.env.API_KEYS ? process.env.API_KEYS.split(",").map((key) => key.trim()).filter(Boolean) : [],
   ioApiKey: process.env.IO_API_KEY || "",
   jwtSecret: process.env.JWT_SECRET || "",
+  sellerTokenHours: Number(process.env.SELLER_TOKEN_HOURS || 8),
+  sellerLoginMaxAttempts: Number(process.env.SELLER_LOGIN_MAX_ATTEMPTS || 5),
+  sellerLoginWindowMs: Number(process.env.SELLER_LOGIN_WINDOW_MS || 5 * 60 * 1000),
   db: {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,

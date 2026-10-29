@@ -3,10 +3,10 @@ const env = require("../config/env");
 const AppError = require("../errors/AppError");
 const logger = require("../config/logger");
 
-const buildConfig = (method, endpoint, body) => ({
+const buildConfig = (method, endpoint, body, timeoutMs) => ({
   method,
   maxBodyLength: Infinity,
-  timeout: env.httpTimeoutMs,
+  timeout: timeoutMs || env.httpTimeoutMs,
   url: endpoint,
   headers: {
     "Content-Type": "application/json",
@@ -16,9 +16,9 @@ const buildConfig = (method, endpoint, body) => ({
   ...(body ? { data: body } : {}),
 });
 
-const request = async (method, endpoint, body) => {
+const request = async (method, endpoint, body, timeoutMs) => {
   try {
-    return await axios.request(buildConfig(method, endpoint, body));
+    return await axios.request(buildConfig(method, endpoint, body, timeoutMs));
   } catch (error) {
     const message = error.response
       ? `HTTP ${error.response.status} en ${endpoint}`
@@ -37,5 +37,5 @@ const request = async (method, endpoint, body) => {
 };
 
 exports.getJson = (endpoint) => request("get", endpoint);
-exports.postJson = (endpoint, body) => request("post", endpoint, body);
+exports.postJson = (endpoint, body, timeoutMs) => request("post", endpoint, body, timeoutMs);
 

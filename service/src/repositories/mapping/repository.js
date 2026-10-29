@@ -27,7 +27,8 @@ async function getStationData() {
 async function getColorsFlagStation(id) {
   const query = `SELECT color
                  FROM public.bandera_color
-                 WHERE id_estacion = $1 AND activo = true;`;
+                 WHERE id_estacion = $1 AND activo = true
+                 ORDER BY id;`;
   const result = await client.query(query, [id]);
   return result.rows || [];
 }
@@ -37,6 +38,7 @@ exports.producthoses = async (screenid) => {
     const query = `
       SELECT
         d.id_nsx_dispensador as dispenserid,
+        d.hibrido as hybrid,
         p.cara as dispenserside,
         p.id as positionid,
         p.id_nsx_posicion as nsxpositionid,
@@ -46,9 +48,11 @@ exports.producthoses = async (screenid) => {
         pro.id_nsx_producto as nsxproductid,
         pro.nombre as product,
         pro.precio as price,
+        m.precio_publico as publicprice,
         p.formato_dinero as moneyformat,
         p.formato_precio as priceformat,
         p.formato_volumen as volumeformat,
+        p.maximo_dinero as maxmoney,
         lado as side,
         unidad_medida as unitofmeasurement,
         color as color,
@@ -101,6 +105,32 @@ exports.speeddial = async () => {
   } catch (error) {
     logger.error("Error obteniendo marcaciones rapidas", error);
     throw new AppError("Error obteniendo modulos", 502, { details: error.message });
+  }
+};
+
+exports.identifiers = async () => {
+  try {
+    const query = `SELECT id_nsx_identificador as identifierid, nombre as name
+                   FROM public.identificador_cliente
+                   ORDER BY id_nsx_identificador;`;
+    const response = await client.query(query);
+    return response.rows;
+  } catch (error) {
+    logger.error("Error obteniendo identificadores de cliente", error);
+    throw new AppError("Error obteniendo identificadores de cliente", 502, { details: error.message });
+  }
+};
+
+exports.sellerPaymentMethods = async () => {
+  try {
+    const query = `SELECT id_nsx_forma_pago as nsxpaymentid, nombre as name
+                   FROM public.forma_pago_vendedor
+                   ORDER BY id_nsx_forma_pago;`;
+    const response = await client.query(query);
+    return response.rows;
+  } catch (error) {
+    logger.error("Error obteniendo formas de pago del vendedor", error);
+    throw new AppError("Error obteniendo formas de pago del vendedor", 502, { details: error.message });
   }
 };
 
