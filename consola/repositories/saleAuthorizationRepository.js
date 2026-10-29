@@ -39,7 +39,7 @@ exports.markSaleAuthorizationAsFailed = async (id) => {
     if (response.rowCount > 0) {
       sync = true;
     }
-    logger.info(`AutorizaciÃ³n de venta ${id} marcada como fallida en la base de datos`);
+    logger.info(`Autorización de venta ${id} marcada como fallida en la base de datos`);
   } catch (e) {
     logger.error(e);
     throw new Error("Error:" + e.message);
@@ -58,7 +58,7 @@ exports.markSaleAuthorizationAsVentaZero = async (id) => {
     if (response.rowCount > 0) {
       sync = true;
     }
-    logger.info(`AutorizaciÃ³n de venta ${id} marcada como venta cero en la base de datos`);
+    logger.info(`Autorización de venta ${id} marcada como venta cero en la base de datos`);
   } catch (e) {
     logger.error(e);
     throw new Error("Error:" + e.message);

@@ -32,6 +32,13 @@ async function processSaleAuthorizationQueue({
               item.data,
               responseData.venta,
             );
+
+            // Acá debería generar el registro de venta para hospitality
+            
+            
+
+
+
           } else if (responseData?.ventaZero) {
             sync = await repository.markSaleAuthorizationAsVentaZero(
               item.data.id,
