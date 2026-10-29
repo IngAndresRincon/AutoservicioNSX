@@ -5,6 +5,7 @@ module.exports = {
   product: require("./product/controller"),
   programming: require("./programming/controller"),
   sale: require("./sale/controller"),
+  seller: require("./seller/controller"),
   system: require("./system/controller"),
   terminal: require("./terminal/controller"),
 };

@@ -25,8 +25,11 @@ exports.getrefpresetid = async (params) => {
 
 exports.createBill = async (params) => {
   try {
-    const queryAuthorization = `SELECT id FROM public.autorizacion 
-    WHERE id_venta = $1 LIMIT 1;`;
+    // La venta puede ser del autoservicio, de un vendedor o de un cliente identificado por el vendedor
+    const queryAuthorization = `SELECT 1 FROM public.autorizacion WHERE id_venta = $1
+      UNION ALL SELECT 1 FROM public.preset_vendedor WHERE id_venta = $1
+      UNION ALL SELECT 1 FROM public.preset_cliente WHERE id_venta = $1
+      LIMIT 1;`;
     const res0 = await client.query(queryAuthorization, [params.saleId]);
 
     if (res0.rowCount === 0) {

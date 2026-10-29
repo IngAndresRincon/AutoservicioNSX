@@ -13,6 +13,7 @@ const nsxRoute = require("./routes/nsx/route");
 const productRoute = require("./routes/product/route");
 const programmingRoute = require("./routes/programming/route");
 const saleRoute = require("./routes/sale/route");
+const sellerRoute = require("./routes/seller/route");
 const systemRoute = require("./routes/system/route");
 const terminalRoute = require("./routes/terminal/route");
 
@@ -52,6 +53,7 @@ apiRouter.use("/client", clientRoute);
 apiRouter.use("/programming", programmingRoute);
 apiRouter.use("/nsx", nsxRoute);
 apiRouter.use("/sale", saleRoute);
+apiRouter.use("/seller", sellerRoute);
 
 app.use("/nsx-autoservice-api/V1", apiRouter);
 

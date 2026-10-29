@@ -5,6 +5,7 @@ const { loopSyncSale, syncSaleNSX } = require("./workers/saleAuthorizationWorker
 const { startProcessReturnBalance } = require("./workers/returnBalanceWorker");
 const { loopTransactionPayments } = require("./workers/transactionPaymentWorker");
 const { loopShifts } = require("./workers/shift");
+const { loopPresetVendedor } = require("./workers/presetVendedorWorker");
 
 async function startConsole() {
   loopSyncModule(); //Obtener configuración de NSX
@@ -14,7 +15,9 @@ async function startConsole() {
   startProcessReturnBalance(); //Enviar a NSX el registro de consumo de QR usado para regresar saldo
   loopTransactionPayments();  //Procesar automáticamente las transacciones por lectura de código QR 
   
-  loopShifts();  //Procesar automáticamente las transacciones por lectura de código QR 
+  loopShifts();  //Procesar automáticamente las transacciones por lectura de código QR
+
+  loopPresetVendedor(); // Seguir los presets del vendedor de paso hasta que haya venta
 }
 
 startConsole();

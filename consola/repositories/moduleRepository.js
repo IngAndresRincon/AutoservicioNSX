@@ -60,24 +60,39 @@ exports.registerProducts = async (data) => {
   return sync;
 };
 
+// Los colores se guardan en el orden de NSX (el id sigue ese orden) y el mapeo los responde por id
+const recordStationColors = async (idStation, colors) => {
+  await client.query(`DELETE FROM public.bandera_color WHERE id_estacion = $1;`, [idStation]);
+
+  for (const color of colors) {
+    await client.query(`INSERT INTO public.bandera_color (id_estacion,color) VALUES($1,$2);`, [idStation, color]);
+  }
+};
+
 exports.recordStationData = async (params) => {
   let sync = false;
   try {
-    let query = `SELECT id FROM public.estacion LIMIT 1;`;
-    const res0 = await client.query(query);
+    const res0 = await client.query(`SELECT id FROM public.estacion LIMIT 1;`);
+    const values = [params.nombreEDS, params.bandera.id, params.bandera.petrolera, params.maximoVueltos];
+
+    let res1;
     if (res0.rowCount == 0) {
-      query = `INSERT INTO public.estacion (nombre,id_bandera,bandera,valor_max_vueltos) 
-      VALUES('${params.nombreEDS}', ${params.bandera.id},'${params.bandera.petrolera}', ${params.maximoVueltos });`;
+      res1 = await client.query(
+        `INSERT INTO public.estacion (nombre,id_bandera,bandera,valor_max_vueltos)
+         VALUES($1,$2,$3,$4) RETURNING id;`,
+        values,
+      );
     } else {
-      query = `UPDATE public.estacion 
-                SET nombre = '${params.nombreEDS}', 
-                    id_bandera =  ${params.bandera.id},
-                    bandera = '{${params.bandera.petrolera}}',
-                    valor_max_vueltos = ${params.maximoVueltos }
-                WHERE id = ${res0.rows[0]["id"]};`;
+      res1 = await client.query(
+        `UPDATE public.estacion
+         SET nombre = $1, id_bandera = $2, bandera = $3, valor_max_vueltos = $4
+         WHERE id = $5 RETURNING id;`,
+        [...values, res0.rows[0]["id"]],
+      );
     }
-    const res1 = await client.query(query);
+
     if (res1.rowCount > 0) {
+      await recordStationColors(res1.rows[0].id, params.bandera.colores ?? []);
       sync = true;
     }
   } catch (e) {
@@ -120,8 +135,12 @@ exports.recordDispenserMapping = async (params) => {
     await client.query(query);
 
     for (let i = 0; i < params.length; i++) {
-      query = `INSERT INTO public.dispensador (id_nsx_dispensador,marca,tipo) VALUES(${params[i].idDispensador},'ZC',${params[i].tipoDispensador}) RETURNING *;`;
-      const res1 = await client.query(query);
+      query = `INSERT INTO public.dispensador (id_nsx_dispensador,marca,tipo,hibrido) VALUES($1,'ZC',$2,$3) RETURNING *;`;
+      const res1 = await client.query(query, [
+        params[i].idDispensador,
+        params[i].tipoDispensador,
+        params[i].hibrido === true,
+      ]);
       if (res1.rowCount > 0) {
         const idDispenser = res1.rows[0].id;
         const listDispenserSide = params[i].caras;
@@ -129,18 +148,27 @@ exports.recordDispenserMapping = async (params) => {
         for (let j = 0; j < listDispenserSide.length; j++) {
           const dispenserSide = listDispenserSide[j];
           const listPositions = listDispenserSide[j].posiciones;
+
+          // Una pantalla por cara (por su serial); todas las posiciones de la cara quedan ligadas a ella
+          const resScreen = await client.query(
+            `INSERT INTO public.pantalla (serial,ip) VALUES($1,$2) RETURNING *;`,
+            [dispenserSide.serialPantalla, "0.0.0.0"],
+          );
+          const idScreen = resScreen.rows[0].id;
+
           for (let k = 0; k < listPositions.length; k++) {
             query = `INSERT INTO public.posicion (id_dispensador,cara,id_nsx_posicion,
-            mangueras,formato_dinero,formato_volumen,formato_precio,codigo_tankio)
+            mangueras,formato_dinero,formato_volumen,formato_precio,codigo_tankio,maximo_dinero)
                     VALUES (
-                    ${idDispenser}, 
-                    ${dispenserSide.numeroCara}, 
+                    ${idDispenser},
+                    ${dispenserSide.numeroCara},
                     ${listPositions[k].idPosicion},
                     ${listPositions[k].mangueras.length},
                     ${listPositions[k].formato.formatoDinero},
                     ${listPositions[k].formato.formatoVolumen},
                     ${listPositions[k].formato.formatoPrecio},
-                    '${listPositions[k].codigoTankio}') RETURNING *`;
+                    '${listPositions[k].codigoTankio}',
+                    ${Number(listPositions[k].formato.maximoDinero) || "NULL"}) RETURNING *`;
 
             const res2 = await client.query(query);
             if (res2.rowCount > 0) {
@@ -149,7 +177,7 @@ exports.recordDispenserMapping = async (params) => {
               const listHose = listPositions[k].mangueras;
               const idPosition = res2.rows[0].id;
               for (let m = 0; m < listHose.length; m++) {
-                query = `INSERT INTO public.manguera (id_posicion,numero_manguera,id_nsx_producto,lado,unidad_medida,color,max_valor)
+                query = `INSERT INTO public.manguera (id_posicion,numero_manguera,id_nsx_producto,lado,unidad_medida,color,max_valor,precio_publico)
                   VALUES (
                         ${idPosition},
                         ${listHose[m].numero},
@@ -157,23 +185,17 @@ exports.recordDispenserMapping = async (params) => {
                         '${listHose[m].lado}',
                         '${listHose[m].producto.unidadMedida}',
                         '${listHose[m].color}',
-                        ${listHose[m].producto.maximoPreset});`;
+                        ${listHose[m].producto.maximoPreset},
+                        ${Number(listHose[m].producto.precioPublico) || "NULL"});`;
                 await client.query(query);
               }
 
 
-              //Insertar información de pantallas 
-
-              const query3 = `INSERT INTO public.pantalla (serial,ip) VALUES($1,$2) RETURNING *;`;
-              const res3 = await client.query(query3,[ dispenserSide.serialPantalla,'0.0.0.0']);
-              if(res3.rowCount>0){
-
-                //Insertar relación pantalla_posición
-                const query4 = `INSERT INTO public.pantalla_posicion (id_pantalla,id_posicion)
-                VALUES ($1,$2) RETURNING *;`;
-                const res4 = await client.query(query4,[res3.rows[0].id,idPosition]);
-                console.log(res4.rowCount>0?true:false) ;
-              }
+              // Relación pantalla_posición
+              await client.query(
+                `INSERT INTO public.pantalla_posicion (id_pantalla,id_posicion) VALUES ($1,$2);`,
+                [idScreen, idPosition],
+              );
             }
           }
         }
@@ -225,6 +247,40 @@ exports.recordShift = async (params) => {
   } catch (error) {
     logger.error(error);
     throw new Error("Error al registrar los turnos:" + error.message);
+  }
+};
+
+exports.recordIdentifiers = async (params) => {
+  try {
+    await client.query(`TRUNCATE TABLE public.identificador_cliente RESTART IDENTITY;`);
+
+    for (const item of params) {
+      await client.query(
+        `INSERT INTO public.identificador_cliente (id_nsx_identificador,nombre) VALUES($1,$2);`,
+        [item.id, item.nombre],
+      );
+    }
+    return true;
+  } catch (error) {
+    logger.error(error);
+    throw new Error("Error al registrar los identificadores:" + error.message);
+  }
+};
+
+exports.recordSellerPaymentMethods = async (params) => {
+  try {
+    await client.query(`TRUNCATE TABLE public.forma_pago_vendedor RESTART IDENTITY;`);
+
+    for (const item of params) {
+      await client.query(
+        `INSERT INTO public.forma_pago_vendedor (id_nsx_forma_pago,nombre) VALUES($1,$2);`,
+        [item.idFormaPago, item.nombre],
+      );
+    }
+    return true;
+  } catch (error) {
+    logger.error(error);
+    throw new Error("Error al registrar las formas de pago del vendedor:" + error.message);
   }
 };
 

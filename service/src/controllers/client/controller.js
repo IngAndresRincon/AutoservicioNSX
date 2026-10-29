@@ -80,3 +80,81 @@ exports.additionalInformation = async (req, res, next) => {
     return next(error);
   }
 };
+
+const isNumber = (value) => value !== undefined && value !== null && value !== "" && !Number.isNaN(Number(value));
+
+const requireNumbers = (body, fields) => {
+  const invalid = fields.find((field) => !isNumber(body[field]));
+  if (invalid) {
+    throw new AppError(`El campo ${invalid} es obligatorio y debe ser numerico`, 400);
+  }
+};
+
+exports.readIdentifier = async (req, res, next) => {
+  try {
+    requireNumbers(req.body, ["positionId", "type"]);
+
+    const content = await clientService.readIdentifier({
+      positionId: Number(req.body.positionId),
+      type: Number(req.body.type),
+      timeoutSeconds: isNumber(req.body.timeoutSeconds) ? Number(req.body.timeoutSeconds) : undefined,
+    });
+    return res.status(200).json({ isError: false, message: "Identificador leido", content });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.authorizeClient = async (req, res, next) => {
+  try {
+    const body = req.body;
+    requireNumbers(body, ["positionId", "hoseNumber", "programmingType", "identifierType"]);
+
+    const programmingType = Number(body.programmingType);
+    const identifierType = Number(body.identifierType);
+    if (![1, 2, 3].includes(programmingType)) {
+      throw new AppError("programmingType debe ser 1 (lleno), 2 (dinero) o 3 (volumen)", 400);
+    }
+    if (![1, 2, 3].includes(identifierType)) {
+      throw new AppError("identifierType debe ser 1 (iButton), 2 (teclado) o 3 (placa)", 400);
+    }
+    if (programmingType !== 1) {
+      requireNumbers(body, ["value"]);
+    }
+    if (!body.serial) {
+      throw new AppError("El campo serial es obligatorio", 400);
+    }
+    if (identifierType === 2 && !body.key) {
+      throw new AppError("El campo key es obligatorio para el teclado", 400);
+    }
+
+    const content = await clientService.authorizeClient({
+      document: req.seller ? req.seller.document : null,
+      positionId: Number(body.positionId),
+      hoseNumber: Number(body.hoseNumber),
+      programmingType,
+      value: programmingType === 1 ? 0 : Number(body.value),
+      km: isNumber(body.km) ? Math.round(Number(body.km)) : null,
+      identifierType,
+      serial: String(body.serial),
+      key: body.key ? String(body.key) : null,
+    });
+    return res.status(201).json({ isError: false, message: "Cliente autorizado", content });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.getClientPreset = async (req, res, next) => {
+  try {
+    requireNumbers(req.params, ["id"]);
+
+    const content = await clientService.getClientPreset({
+      id: Number(req.params.id),
+      document: req.seller ? req.seller.document : null,
+    });
+    return res.status(200).json({ isError: false, message: "Preset del cliente consultado", content });
+  } catch (error) {
+    return next(error);
+  }
+};

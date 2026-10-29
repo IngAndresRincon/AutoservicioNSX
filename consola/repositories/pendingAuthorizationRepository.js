@@ -27,7 +27,18 @@ exports.getPendingAuthorization = async () => {
                     ON a.id_programacion = pg.id
                     INNER JOIN public.cliente as c
                     ON pg.id_cliente = c.id
-                    WHERE a.sincronizado = 0 LIMIT 1;`;
+                    WHERE a.sincronizado = 0
+                    AND NOT EXISTS (
+                      SELECT 1 FROM public.preset_vendedor as v
+                      WHERE v.id_posicion = a.id_posicion
+                        AND v.sincronizado IN (0, 2, 8) AND v.id_venta IS NULL
+                    )
+                    AND NOT EXISTS (
+                      SELECT 1 FROM public.preset_cliente as c2
+                      WHERE c2.id_posicion = a.id_posicion
+                        AND c2.sincronizado IN (0, 2, 8) AND c2.id_venta IS NULL
+                    )
+                    LIMIT 1;`;
     const res0 = await client.query(query);
 
     console.log(JSON.stringify(res0.rows[0]));

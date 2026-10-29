@@ -28,6 +28,31 @@ exports.createprogramming = async (params) => {
       };
     }
 
+    // Autoservicio: una sola posicion por cara. Se mira toda la cara (misma cara del mismo dispensador):
+    // otro preset activo de vendedor, de cliente identificado o de autoservicio en cualquiera de sus posiciones la ocupa.
+    // El vendedor (hibrido) no tiene este bloqueo: solo revisa su propia posicion.
+    const faceBusy = await client.query(
+      `WITH face AS (
+         SELECT p2.id FROM public.posicion p1
+         INNER JOIN public.posicion p2 ON p2.id_dispensador = p1.id_dispensador AND p2.cara = p1.cara
+         WHERE p1.id = $1
+       )
+       SELECT 1 FROM public.preset_vendedor
+         WHERE id_posicion IN (SELECT id FROM face) AND sincronizado IN (0, 2, 8) AND id_venta IS NULL
+       UNION ALL
+       SELECT 1 FROM public.preset_cliente
+         WHERE id_posicion IN (SELECT id FROM face) AND sincronizado IN (0, 2, 8) AND id_venta IS NULL
+       UNION ALL
+       SELECT 1 FROM public.autorizacion
+         WHERE id_posicion IN (SELECT id FROM face) AND id_posicion <> $1
+           AND sincronizado IN (0, 2, 8) AND id_venta IS NULL AND fecha_registro > NOW() - INTERVAL '30 minutes'
+       LIMIT 1;`,
+      [params.positionId],
+    );
+    if (faceBusy.rowCount > 0) {
+      throw new AppError("La cara esta siendo atendida: en autoservicio solo se atiende una posicion por cara", 409);
+    }
+
     const moneyValue =
       params.programmingType === 2
         ? params.programmingValue
@@ -87,6 +112,9 @@ exports.createprogramming = async (params) => {
         }
       : null;
   } catch (error) {
+    if (error instanceof AppError) {
+      throw error;
+    }
     logger.error("Error creando programacion", error);
     throw new AppError("Error creando programacion", 502, { details: error.message });
   }
