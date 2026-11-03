@@ -28,7 +28,7 @@ exports.TerminalPaymentProcess = async () =>{
     try {
       for(let i=0; i<terminals.length; i++){
         const terminal = terminals[i];
-        const record = await service.findTransactionPayment({statusId:1,terminal:terminal});
+        const record = await service.findTransactionPayment({statusId:0,terminal:terminal});
         if(record){
           await service.generatePaymentRequets({terminal:terminals[i], payment:record});
         }
