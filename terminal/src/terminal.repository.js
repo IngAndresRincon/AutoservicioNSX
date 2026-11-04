@@ -46,9 +46,12 @@ exports.findTransactionPayment = async  ({statusId,terminal})=>{
 
 exports.updateTransactionStatus = async (id,statusId, response) =>{
 
+
     let query = null;
 
     if(statusId ===2){
+
+        const payload = response.content[0];
         query = `UPDATE public.transaccion_pago SET 
                     respuesta_pago  =$1,
                     id_estado_transaccion = $2,
@@ -56,13 +59,13 @@ exports.updateTransactionStatus = async (id,statusId, response) =>{
                     recibo = $3,
                     franquicia = $4,
                     tarjeta = $5
-                WHERE id = $3 RETURNING *;`;
+                WHERE id = $6 RETURNING *;`;
         const result = await pool.query(query,[
             JSON.stringify(response),
             statusId,
-            response.receiptId ?? 0,
-            response.franchise ?? "",
-            response.cardNumber ?? "",
+            payload.receiptId ?? 0,
+            payload.franchise ?? "",
+            payload.cardNumber ?? "",
             id
         ]);
         return result.rowCount>0? result.rows[0] : null;
@@ -103,3 +106,57 @@ exports.releasePaymentById = async (id) =>{
 
     return result.rowCount>0? result.rows[0] : null;
 }
+
+
+
+exports.findApprovePayment = async (terminal, syncId) => {
+  const query = `SELECT 
+                    ap.id,
+                    COALESCE(a.id_venta,0) as saleId,
+                    id_autorizacion as authorizationId,
+                    id_terminal as terminalId,
+                    monto as amount,
+                    id_recibo as receiptId,
+                    solicitud_payload as requestPayload,
+                    respuesta_payload as responsePayload,
+                    error,
+                    estado as status,
+                    ap.sincronizado as synchronizer
+                    FROM aprobacion_pago as ap
+                    INNER JOIN public.autorizacion as a
+                    ON ap.id_autorizacion = a.id
+                WHERE ap.sincronizado = $1 AND ap.id_terminal = $2;`;
+  const result = await pool.query(query, [syncId, terminal.id ]);
+  return result.rowCount > 0 ? result.rows : [];
+};
+
+
+
+exports.updateApprovePayment = async (id, status, response) => {
+  let query = null;
+
+  if (status === 1) {
+    query = `UPDATE public.aprobacion_pago SET 
+                      sincronizado = $1,
+                      solicitud_payload = $2,
+                      fecha_respuesta = now()
+                    WHERE id = $3 RETURNING *;`;
+  }
+
+  if (status === 2 || status === 3 || status === 4 || status === 5) {
+    query = `UPDATE public.aprobacion_pago SET 
+                  sincronizado = $1,
+                  respuesta_payload = $2,
+                  fecha_respuesta = now()
+                WHERE id = $3 RETURNING *;`;
+  }
+
+  if(!query) return null;
+
+  const result = await pool.query(query, [
+    status,
+    JSON.stringify(response),
+    id,
+  ]);
+  return result.rowCount > 0 ? result.rows : null;
+};

@@ -14,45 +14,63 @@ async function processSaleAuthorizationQueue({
 
   while (saleAuthorization.length > 0) {
     for (let i = saleAuthorization.length - 1; i >= 0; i--) {
-      const item = saleAuthorization[i];
+      const item = saleAuthorization[i].data;
       let sync = false;
 
       try {
         const response = await service.getSaleAuthorizationState(
-          item.data.id_presetnsx,
+          item.id_presetnsx,
         );
 
         if (response.status !== 200) {
-          sync = await repository.markSaleAuthorizationAsFailed(item.data.id);
+          sync = await repository.markSaleAuthorizationAsFailed(item.id);
         } else {
           const responseData = response.data?.data;
 
           if (responseData?.venta != null) {
             sync = await repository.registerSaleAuthorization(
-              item.data,
+              item,
               responseData.venta,
             );
 
             // Acá debería generar el registro de venta para hospitality
-            
-            
+            const mp =await repository.findPaymentMethodByProgramming(item.id_programacion);
 
+              if(mp){
+                  if(mp.recibo>0){
+                    // Generar registro de venta para hospitality
+
+                    const exist = await repository.findRecordHospitalitySale(item.id);
+                    if(!exist){
+
+                      const result =await repository.registerSaleForHospitality(
+                        item,
+                        mp.recibo,
+                        responseData.venta
+                      );
+
+                      if(!result){
+                        logger.error(`No se logró almacenar los datos de la venta para hospitality: ${JSON.stringify(responseData.venta)}`);
+                      }
+                    }
+                  }
+              }
 
 
           } else if (responseData?.ventaZero) {
             sync = await repository.markSaleAuthorizationAsVentaZero(
-              item.data.id,
+              item.id,
             );
           } else if (
             responseData?.estadoSurtidor &&
             responseData.estadoSurtidor.toString().toUpperCase() === "SURTIENDO"
           ) {
-            sync = await repository.reportStatusWhileSupplying(item.data.id);
+            sync = await repository.reportStatusWhileSupplying(item.id);
           }
         }
       } catch (error) {
         logger.error(
-          `Error al sincronizar venta ${item.data.id}: ${error.message}`,
+          `Error al sincronizar venta ${item.id}: ${error.message}`,
         );
       }
 

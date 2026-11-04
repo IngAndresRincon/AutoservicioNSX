@@ -97,22 +97,14 @@ exports.getPendingAuthorization = async () => {
 };
 
 exports.updateAuthorizationSync = async (params, data, statusCode) => {
-  let sync = false;
-  try {
-    const idPresetNsx = data.data === null ? 0 : data.data.idPreset;
 
-    const query = `UPDATE public.autorizacion 
-                    SET sincronizado = ${statusCode},
-                        id_presetnsx = ${idPresetNsx}
-                    WHERE id = ${params.authorizationId};`;
-    const response = await client.query(query);
-    if (response.rowCount > 0) {
-      sync = true;
-    }
-  } catch (e) {
-    logger.error(e);
-    throw new Error("Error:" + e.message);
-  }
+  const idPresetNsx = data.data === null ? 0 : data.data.idPreset;
 
-  return sync;
+  const query = `UPDATE public.autorizacion 
+                    SET sincronizado = $1,
+                        id_presetnsx = $2
+                    WHERE id = $3;`;
+  const result = await client.query(query,[statusCode, idPresetNsx, params.authorizationId]);
+  return result.rowCount > 0? true: false ;
+
 };

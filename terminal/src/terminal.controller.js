@@ -63,6 +63,65 @@ exports.TerminalStatusPayment = async ()=>{
 }
 
 
+
+exports.TerminalApprovePayment = async () =>{
+
+  const timeout = 10000;
+  while(true){
+    await new Promise((resolve) => setTimeout(resolve, timeout)); // Esperar 10 segundo
+    for(let i =0; i < terminals.length;i++)
+    {
+      const terminal = terminals[0];
+      if(!terminal.approval) {
+        timeout = 360000;
+        continue;
+      }
+      const records = await service.findApprovePayment(terminal,0); //0 Es para aprobaciones con sincronización en 0
+      if(records.length>0){
+        console.log(records);
+        await service.sendPaymentApproval(terminal, records);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 15000)); // Esperar 5 segundos
+    }
+  }
+}
+
+
+exports.TerminalStatusApprovePayment = async () =>{
+
+  let timeout = 5000;
+
+  while(true){
+    await new Promise((resolve) => setTimeout(resolve, timeout)); // Esperar 1/2 segundo
+    for(let i =0; i < terminals.length;i++)
+    {
+      const terminal = terminals[0];
+      if(!terminal.approval) {
+        timeout = 360000;
+        continue;
+      };
+      const records = await service.findApprovePayment(terminal,4);
+      if(records.length>0){
+        // console.log(records);
+        await service.requestStatusApprovePayment(terminal, records);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 5000)); // Esperar 5 segundos
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 exports.TerminalReleasePayment = async () => {
   while (true) {
     try {
