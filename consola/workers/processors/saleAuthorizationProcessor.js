@@ -65,7 +65,7 @@ async function processSaleAuthorizationQueue({
             responseData?.estadoSurtidor &&
             responseData.estadoSurtidor.toString().toUpperCase() === "SURTIENDO"
           ) {
-            sync = await repository.reportStatusWhileSupplying(item.id);
+            await repository.reportStatusWhileSupplying(item.id);
           }
         }
       } catch (error) {
