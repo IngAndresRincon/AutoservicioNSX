@@ -12,6 +12,11 @@ const env = {
     database:  process.env.DB_DATABASE,
     ssl: String(process.env.DB_SSL || 'false').toLowerCase() === 'true'
   }, 
+  endpoints:{
+    url_payment: process.env.TERMINAL_URL_PAYMENT,
+    url_status_payment: process.env.TERMINAL_URL_STATUS_PAYMENT,
+    url_pledge: process.env.TERMINAL_URL_PLEDGE
+  }
 };
 
 module.exports = {env};

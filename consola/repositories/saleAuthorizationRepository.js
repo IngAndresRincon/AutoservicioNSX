@@ -2,96 +2,98 @@ const { client } = require("../database/dbpostgres");
 const logger = require("../utils/logger");
 
 exports.getPendingSaleAuthorization = async () => {
-  let list = [];
-  try {
-    let query = `SELECT id,id_programacion,id_presetnsx,id_venta
-    FROM public.autorizacion WHERE sincronizado = 2 AND id_venta IS NULL`;
-    const res0 = await client.query(query);
-    if (res0.rowCount > 0) {
-      list = res0.rows;
-    }
-  } catch (e) {
-    logger.error(e);
-  }
-  return list;
+    
+  const query = `SELECT a.id,id_programacion,id_presetnsx,id_venta,a.id_posicion,tp.id_terminal
+                  FROM public.autorizacion as a
+                  INNER JOIN public.terminal_posicion as tp
+                  ON a.id_posicion = tp.id_posicion AND tp.activo = $1
+                  WHERE sincronizado = $2 AND id_venta IS NULL`;
+  const result  = await client.query(query, [true, 2]);
+  return result.rowCount > 0 ? result.rows : [];
+
 };
 
 exports.reportStatusWhileSupplying = async (id) => {
-  try {
-    const query = `UPDATE public.autorizacion 
-                    SET sincronizado = 8
-                    WHERE id = ${id} AND sincronizado != 8;`;
-    await client.query(query);
-    logger.info(`Autorización de venta ${id} marcada como surtiendo en la base de datos`);
-  } catch (e) {
-    logger.error(e);
-    throw new Error("Error:" + e.message);
-  }
-};
+
+  const query = `UPDATE public.autorizacion 
+                    SET sincronizado = $1
+                    WHERE id = $2 AND sincronizado != $3;`;
+  const result = await client.query(query,[8,id,8]);
+  return result.rowCount > 0 ? true : false;
+}
 
 exports.markSaleAuthorizationAsFailed = async (id) => {
-  let sync = false;
-  try {
-    const query = `UPDATE public.autorizacion 
-                    SET sincronizado = 3
-                    WHERE id = ${id};`;
-    const response = await client.query(query);
-    if (response.rowCount > 0) {
-      sync = true;
-    }
-    logger.info(`AutorizaciÃ³n de venta ${id} marcada como fallida en la base de datos`);
-  } catch (e) {
-    logger.error(e);
-    throw new Error("Error:" + e.message);
-  }
 
-  return sync;
+  const query = `UPDATE public.autorizacion 
+                    SET sincronizado = $1
+                    WHERE id = $2 RETURNING * ;`;
+  const result = await client.query(query,[3,id]);
+  return result.rowCount > 0 ? true : false;
 };
 
 exports.markSaleAuthorizationAsVentaZero = async (id) => {
-  let sync = false;
-  try {
-    const query = `UPDATE public.autorizacion 
-                    SET sincronizado = 6
-                    WHERE id = ${id};`;
-    const response = await client.query(query);
-    if (response.rowCount > 0) {
-      sync = true;
-    }
-    logger.info(`AutorizaciÃ³n de venta ${id} marcada como venta cero en la base de datos`);
-  } catch (e) {
-    logger.error(e);
-    throw new Error("Error:" + e.message);
-  }
 
-  return sync;
+  const query = `UPDATE public.autorizacion 
+                    SET sincronizado = $1
+                    WHERE id = $2 RETURNING *;`;
+  const result = await client.query(query,[6,id]);
+  return result.rowCount > 0 ? true : false;
 };
 
 exports.registerSaleAuthorization = async (auth, sale) => {
-  let sync = false;
   try {
     const saleResult = await saveRecordSale(sale);
 
     if (!saleResult) {
-      throw new Error(
-        `No se logró almacenar los datos de la venta: ${JSON.stringify(sale)}`,
-      );
+      logger.error(`No se logró almacenar los datos de la venta: ${JSON.stringify(sale)}`);
+      return false;
     }
 
     const query = `UPDATE public.autorizacion 
-                    SET id_venta = $1, sincronizado  = 4
-                    WHERE id = $2 AND sincronizado IN (8,2);`;
-    const response = await client.query(query, [sale.idVenta, auth.id]);
-    if (response.rowCount > 0) {
-      sync = true;
-    }
+                    SET id_venta = $1, sincronizado  = $2
+                    WHERE id = $3 AND sincronizado IN (8,2);`;
+    const result = await client.query(query, [sale.idVenta,4,auth.id]);
+    return result.rowCount > 0 ? true : false;
   } catch (e) {
-    logger.error(e);
-    throw new Error("Error:" + e.message);
+    logger.error(`Error al registrar la venta: ${e.message}`);
   }
-
-  return sync;
+  return false;
 };
+
+
+exports.findPaymentMethodByProgramming = async(programmingId) => {
+  const query = `SELECT * FROM public.transaccion_pago 
+                  WHERE id_programacion = $1 
+                  AND id_estado_transaccion = $2 LIMIT 1;`;
+  const result = await client.query(query, [programmingId, 2]);
+  return result.rowCount>0 ? result.rows[0] : null; 
+}
+
+exports.findRecordHospitalitySale = async(authorizationId) =>{
+
+    const query = `SELECT id FROM public.aprobacion_pago 
+                    WHERE id_autorizacion = $1;`;
+    const result = await client.query(query, [authorizationId]);
+    return result.rowCount>0 ? result.rows[0] : null;
+}
+
+exports.registerSaleForHospitality = async (auth, reciptId, sale) => {
+
+  const query = `INSERT INTO public.aprobacion_pago (
+                  id_autorizacion,
+                  id_terminal,
+                  monto,
+                  id_recibo
+                ) VALUES($1, $2, $3, $4) RETURNING *;`;
+
+  const result = await client.query(query, [
+                    auth.id,
+                    auth.id_terminal,
+                    sale.dinero,
+                    reciptId]);
+  return result.rowCount>0 ? result.rows[0] : null;
+}
+
 
 const saveRecordSale = async (sale) => {
   const queryText = `INSERT INTO public.venta (

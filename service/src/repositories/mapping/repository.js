@@ -17,7 +17,12 @@ exports.getStationData = async () => {
 };
 
 async function getStationData() {
-  const query = `SELECT id, nombre as name, id_bandera as flagid, bandera as flag, valor_max_vueltos as maximum_change_amount
+  const query = `SELECT id,
+                  nombre as name, 
+                  id_bandera as flagid,
+                  bandera as flag, 
+                  valor_max_vueltos as maximum_change_amount,
+                  hospitality
                  FROM public.estacion
                  LIMIT 1;`;
   const result = await client.query(query);

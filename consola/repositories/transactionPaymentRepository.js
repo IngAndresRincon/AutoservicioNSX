@@ -2,24 +2,15 @@
 const logger = require("../utils/logger");
 
 exports.getPendingTransactionPayments = async () => {
-  let list = [];
-  try {
-    const query = `
-      SELECT id, id_forma_pago, id_estado_transaccion, fecha_transaccion
-      FROM public.transaccion_pago
-      WHERE id_forma_pago = 3
-        AND id_estado_transaccion = 4;
-    `;
-    const response = await client.query(query);
-    if (response.rowCount > 0) {
-      list = response.rows;
-    }
-  } catch (error) {
-    logger.error(error);
-    throw new Error("Error:" + error.message);
-  }
-
-  return list;
+  const query = `SELECT id,
+                          id_forma_pago, 
+                          id_estado_transaccion, 
+                          fecha_transaccion
+                  FROM public.transaccion_pago
+                  WHERE id_forma_pago = 3
+                  AND id_estado_transaccion = 4;`;
+    const result = await client.query(query);
+    return  result.rowCount > 0 ? result.rows : [];
 };
 
 exports.markTransactionPaymentsAsProcessed = async (ids) => {

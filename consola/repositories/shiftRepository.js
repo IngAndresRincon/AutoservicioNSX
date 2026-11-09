@@ -4,7 +4,10 @@ const { client } = require("../database/dbpostgres");
 exports.getShiftToOpen = async (time) => {
 
     const query = `SELECT * FROM public.turno 
-    WHERE hora_inicial <= $1 AND hora_final >= $1 AND activo = false AND disponible = true LIMIT 1;`;
+                    WHERE hora_inicial <= $1 
+                    AND hora_final >= $1 
+                    AND activo = false 
+                    AND disponible = true LIMIT 1;`;
     const result = await client.query(query, [time]);
     return result.rows[0] || null;
   
@@ -12,7 +15,9 @@ exports.getShiftToOpen = async (time) => {
 
 exports.dateValidity = async (currentDate) =>{
     const query = `SELECT * FROM public.turno 
-    WHERE ($1 BETWEEN fecha_turno_inicial AND fecha_turno_final) AND activo = $2 AND disponible =$2 LIMIT 1;`;
+                    WHERE ($1 BETWEEN fecha_turno_inicial AND fecha_turno_final) 
+                    AND activo = $2 
+                    AND disponible =$2 LIMIT 1;`;
     const result = await client.query(query,[currentDate,true]);
     return result.rowCount>0 ? true: false;
 }

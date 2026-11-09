@@ -2,35 +2,19 @@ const { client } = require("../database/dbpostgres");
 const logger = require("../utils/logger");
 
 exports.consultSyncRequest = async () => {
-  let isSync = false;
-  try {
-    let query = `SELECT  id FROM public.modulo  WHERE sincronizar = true;`;
-    const res0 = await client.query(query);
-    if (res0.rowCount > 0) {
-      isSync = true;
-    }
-  } catch (e) {
-    logger.error(e);
-    throw new Error("Error:" + e.message);
-  }
+  const query = `SELECT  id FROM public.modulo  WHERE sincronizar = $1;`;
+  const result  = await client.query(query, [true]);
+  return result.rowCount > 0 ? true : false;
+}
 
-  return isSync;
-};
 
 exports.syncModule = async () => {
-  let isSync = false;
-  try {
-    let query = `UPDATE public.modulo  SET  sincronizar = false,  fecha_sincronizacion = NOW();`;
-    const res0 = await client.query(query);
-    if (res0.rowCount > 0) {
-      isSync = true;
-    }
-  } catch (e) {
-    logger.error(e);
-    throw new Error("Error:" + e.message);
-  }
+  const query =  `UPDATE public.modulo SET 
+                    sincronizar = $1,
+                    fecha_sincronizacion = NOW();`;
+  const result = await client.query(query, [false]);
+  return result.rowCount > 0 ? true : false;
 
-  return isSync;
 };
 
 exports.registerProducts = async (data) => {
