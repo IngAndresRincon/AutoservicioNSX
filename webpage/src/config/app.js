@@ -17,7 +17,12 @@ function createApp() {
   const app = express();
 
   app.disable('x-powered-by');
-  app.use(helmet());
+  // Este servidor corre por HTTP plano en la red local (sin certificado).
+  // Los defaults de Helmet asumen HTTPS (CSP con upgrade-insecure-requests,
+  // HSTS) y en Chrome eso rompe la carga de assets en cualquier origen que
+  // no sea "localhost" (en una IP de LAN el navegador intenta subir todo a
+  // https:// y falla con ERR_SSL_PROTOCOL_ERROR). Se desactivan esas dos.
+  app.use(helmet({ contentSecurityPolicy: false, hsts: false }));
   app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

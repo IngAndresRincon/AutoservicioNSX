@@ -1,7 +1,7 @@
 /* Colores */
 :root {
-  --bg-sidebar: #3d1975;
-  --hover-sidebar: #4b2190;
+  --bg-sidebar: var(--brand-1);
+  --hover-sidebar: var(--brand-2);
   --text-white: #ffffff;
   --text-muted: #cccccc;
 }

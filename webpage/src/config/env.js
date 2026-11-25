@@ -20,6 +20,10 @@ const env = {
     database:  process.env.DB_DATABASE,
     ssl: String(process.env.DB_SSL || 'false').toLowerCase() === 'true'
   },
+  api: {
+    baseUrl: process.env.API_BASE_URL,
+  },
+  jwtSecret: process.env.JWT_SECRET,
 };
 
 module.exports = {env};
