@@ -18,7 +18,8 @@ exports.synchronizeScreen = async (params) => {
     const selectQuery = "SELECT id FROM public.pantalla WHERE TRIM(serial) = TRIM($1);";
     const res0 = await client.query(selectQuery, [params.serial]);
     if (res0.rowCount === 0) {
-      throw new AppError("No se encuentra pantalla asociada al sistema", 404);
+      // Con el serial recibido en el mensaje, la tablet muestra cual es y se puede registrar en el .80
+      throw new AppError(`No se encuentra pantalla asociada al sistema (serial recibido: ${String(params.serial).trim()})`, 404);
     }
 
     const updateQuery = "UPDATE public.pantalla SET ip = $1 WHERE id = $2;";

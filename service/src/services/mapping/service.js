@@ -29,6 +29,10 @@ exports.sellerPaymentMethods = async () =>{
   return await mappingRepository.sellerPaymentMethods();
 }
 
+exports.realtime = async (screenid) =>{
+  return await mappingRepository.realtime(screenid);
+}
+
 exports.fidelity = async () =>{
   return await mappingRepository.fidelity();
 }

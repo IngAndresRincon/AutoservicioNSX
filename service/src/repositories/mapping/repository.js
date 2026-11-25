@@ -29,6 +29,26 @@ async function getStationData() {
   return result.rows[0] || null;
 }
 
+// Tiempo real de la pantalla (por serial, sobrevive a las resincronizaciones); sin la tabla o sin fila queda apagado
+exports.realtime = async (screenid) => {
+  const off = { enabled: false, intervalMs: 500, style: "carrito" };
+  try {
+    const result = await client.query(
+      `SELECT COALESCE(c.tiempo_real, false) AS enabled,
+              COALESCE(c.intervalo_ms, 500) AS "intervalMs",
+              COALESCE(c.estilo, 'carrito') AS style
+       FROM public.pantalla p
+       LEFT JOIN public.pantalla_config c ON TRIM(c.serial) = TRIM(p.serial)
+       WHERE p.id = $1;`,
+      [screenid],
+    );
+    return result.rows[0] || off;
+  } catch (error) {
+    logger.warn(`No se pudo leer pantalla_config: ${error.message}`);
+    return off;
+  }
+};
+
 async function getColorsFlagStation(id) {
   const query = `SELECT color
                  FROM public.bandera_color
