@@ -118,7 +118,7 @@ exports.findApprovePayment = async (terminal, syncId) => {
 exports.sendPaymentApproval = async (terminal, records) => {
   try {
     for (let i = 0; i < records.length; i++) {
-      const record = records[0];
+      const record = records[i];
       const result = await createRequestApproval(terminal, record);
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Esperar 5 segundos
     }
@@ -183,7 +183,7 @@ exports.requestStatusApprovePayment = async (terminal, records) =>{
   try {
 
   for(let i = 0; i< records.length; i++){
-      const record = records[0];
+      const record = records[i];
       const response = await createRequestStatusApproval(terminal,record);
       if(!response){
         console.log("Error obteniendo el estado de la aprobación de pago");

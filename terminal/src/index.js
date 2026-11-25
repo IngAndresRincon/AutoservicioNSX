@@ -7,4 +7,5 @@ controller.TerminalPaymentProcess();
 controller.TerminalStatusPayment();
 controller.TerminalApprovePayment();
 controller.TerminalStatusApprovePayment();
-controller.TerminalReleasePayment();
+// Pendiente: adaptar consultas a transaccion_pago antes de activar
+// controller.TerminalReleasePayment();
