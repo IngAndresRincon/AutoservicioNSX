@@ -1,0 +1,6 @@
+@NSXAutoServiceAPI_HostAddress = http://localhost:5078
+
+GET {{NSXAutoServiceAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

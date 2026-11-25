@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440">
+<defs>
+ <linearGradient id="paint" x1="0" y1="0" x2=".15" y2="1"><stop stop-color="@BODY1@"/><stop offset=".52" stop-color="@MID@"/><stop offset="1" stop-color="@BODY2@"/></linearGradient>
+ <linearGradient id="window" x1="0" y1="0" x2=".5" y2="1"><stop stop-color="#102b35"/><stop offset=".75" stop-color="#020a12"/></linearGradient>
+ <radialGradient id="hub"><stop stop-color="@LIGHT@"/><stop offset=".24" stop-color="@NEON@"/><stop offset=".38" stop-color="#004452"/><stop offset=".74" stop-color="#04121b"/><stop offset="1" stop-color="#133844"/></radialGradient>
+ </defs>
+<path d="M45 300 Q40 265 67 251 L144 221 Q201 205 295 200 L420 188 Q489 168 581 106 Q609 88 654 88 L790 88 Q825 90 895 126 L993 185 Q1057 201 1139 210 L1165 231 Q1178 252 1163 288 L1136 310 L1050 317 L177 319 L65 317Z" fill="url(#paint)" stroke="#287987" stroke-width="4"/>
+<path d="M425 190 Q510 171 584 110 Q604 98 646 98 L790 99 Q821 104 890 139 L967 189Z" fill="url(#window)" stroke="@NEON@" stroke-width="3"/>
+<path d="M615 101 L540 187 M792 103 L841 187" stroke="#3a929b" stroke-width="4"/>
+<path d="M425 193 Q516 175 586 105 Q610 89 651 89 L792 90 Q832 90 900 130 L998 187" stroke="@NEON@" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="4"/>
+<path d="M45 279 Q82 243 174 224 L323 206 M385 198 L526 195 M857 199 L1030 207 L1160 226" stroke="@NEON@" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="3"/>
+<path d="M405 226 L390 301 Q464 316 650 307 L818 300 Q854 285 871 246 L896 192" stroke="@NEON@" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="3"/>
+<path d="M366 253 L411 250 L386 270 L548 262 L727 249" stroke="@NEON@" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="6"/>
+<path d="M922 243 L1097 242" stroke="@NEON@" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="2"/>
+<path d="M66 252 L128 233 L81 266" fill="@LIGHT@"/>
+<path d="M1110 227 L1164 237 L1133 255 L1098 242Z" fill="@LIGHT@"/>
+<path d="M510 191 L540 183 L565 184 L566 194 L531 201Z" fill="url(#paint)" stroke="@NEON@" stroke-width="2"/>
+<path d="M725 228 L769 226" stroke="#07131d" stroke-width="8" stroke-linecap="round"/>
+<g  transform="translate(245 315)"><circle r="85" fill="#010b13" stroke="#17404d" stroke-width="5"/><circle r="77" fill="none" stroke="@LIGHT@" stroke-width="6" /><circle r="66" fill="#03151e" stroke="@NEON@" stroke-width="5"/><circle r="55" fill="url(#hub)" stroke="#1e8994" stroke-width="3"/><circle r="42" fill="none" stroke="@NEON@" stroke-width="3" stroke-dasharray="5 8"/><circle r="34" fill="@NEON@" opacity=".8"/><path d="M -58 0 H 58 M0 -58 V58" stroke="@LIGHT@" stroke-width="2" opacity=".4"/></g>
+<g  transform="translate(965 315)"><circle r="85" fill="#010b13" stroke="#17404d" stroke-width="5"/><circle r="77" fill="none" stroke="@LIGHT@" stroke-width="6" /><circle r="66" fill="#03151e" stroke="@NEON@" stroke-width="5"/><circle r="55" fill="url(#hub)" stroke="#1e8994" stroke-width="3"/><circle r="42" fill="none" stroke="@NEON@" stroke-width="3" stroke-dasharray="5 8"/><circle r="34" fill="@NEON@" opacity=".8"/><path d="M -58 0 H 58 M0 -58 V58" stroke="@LIGHT@" stroke-width="2" opacity=".4"/></g>
+</svg>

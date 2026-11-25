@@ -1,0 +1,7 @@
+# Copie como Instalar.config (no se sube a git). Si existe, el instalador no pregunta nada.
+Sistema=NSX2
+ServidorSql=127.0.0.1
+Base=EstacionNSX
+UsuarioSql=sa
+ClaveSql=
+IpNsx=127.0.0.1

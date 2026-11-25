@@ -76,7 +76,7 @@ async function cargarModulo(modulo) {
       return;
     }
 
-    const res = await fetch(`/${modulo}?id=${position}`);
+    const res = await fetch(`/api/nsx-autoservice/page/${modulo}?id=${position}`);
     const data = await res.json();
     console.log(data);
 
@@ -95,26 +95,20 @@ async function cargarModulo(modulo) {
             <th>Precio</th>
             <th>Identificador</th>
             <th>Fecha Registro</th>
-            <th>Pagos</th>
-            <th>Anular</th>
             </tr>
             </thead>
         <tbody style="font-size:small">`;
-      // <th>Cambiar Producto</th>
       data.forEach((item) => {
         html += `<tr style="font-size:small; text-align:center">
             <td>${item.idautorizacion}</td>
             <td>${item.producto}</td>
             <td>$ ${item.programacion}</td>
             <td>$ ${item.valorabonado}</td>
-          
+
             <td>$ ${item.precio}</td>
             <td>${item.identificador}</td>
             <td>${item.fecharegistro}</td>
-            <td><button class="btn btn-success" onclick="verpagosautorizacion(${item.idautorizacion})">Ver</button></td>
-            <td><button class="btn btn-danger" onclick="mostrarModalCancelarAutorizacion(${item.idautorizacion})">Anular</button></td>
           </tr>`;
-        //<td><button class="btn btn-info" onclick="cambiarproducto(${item.fkidposicion}, ${item.fkidproducto}, ${item.idautorizacion})">Cambiar</button></td>
       });
 
       html += `</tbody></table></div>`;
@@ -136,7 +130,6 @@ async function cargarModulo(modulo) {
             <th>Precio</th>
             <th>Identificador</th>
             <th>Fecha Registro</th>
-            <th>Autorizar</th>
             </tr>
             </thead>
         <tbody style="font-size:small">`;
@@ -151,7 +144,6 @@ async function cargarModulo(modulo) {
             <td>$ ${item.precio}</td>
             <td>${item.identificador}</td>
             <td>${item.fecharegistro}</td>
-            <td><button class="btn btn-success" onclick="confirmarAutorizacion(${item.idautorizacion})">Autorizar</button></td>
           </tr>`;
       });
 
@@ -171,10 +163,8 @@ async function cargarModulo(modulo) {
             <th>Programación</th>
             <th>Dinero</th>
             <th>Volumen</th>
-            <th>Estado</th>
             <th>Fecha Inicial</th>
             <th>Fecha Final</th>
-            <th>Pagos</th>
             </tr>
             </thead>
         <tbody style="font-size:small">`;
@@ -186,10 +176,8 @@ async function cargarModulo(modulo) {
             <td>$ ${item.programacion}</td>
             <td>$ ${item.dinero}</td>
             <td>${item.volumen} G</td>
-            <td>${item.estado}</td>
             <td>${item.fechainicial}</td>
             <td>${item.fechafinal}</td>
-            <td><button class="btn btn-success" onclick="verpagosautorizacion(${item.idautorizacion})">Ver</button></td>
           </tr>`;
       });
 
