@@ -1,0 +1,47 @@
+<svg viewBox="0 0 550 450" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="clip-disp">
+      <rect x="200" y="35" width="310" height="380" rx="40"/>
+    </clipPath>
+    
+    <clipPath id="clip-pistola">
+      <path d="M 30 320 V 210 C 20 180, 30 165, 55 165 H 80 C 100 165, 110 180, 110 200 V 300 C 110 315, 100 320, 85 320 Z M 60 200 V 290 H 90 V 200 Z" fill-rule="evenodd"/>
+    </clipPath>
+
+    <clipPath id="clip-pantalla">
+      <rect x="225" y="65" width="260" height="170" rx="15"/>
+    </clipPath>
+  </defs>
+
+  <path d="M 45 335 V 380 A 30 30 0 0 0 75 410 H 200" fill="none" stroke="#2A2A2A" stroke-width="24" stroke-linecap="round"/>
+
+  <path d="M 75 185 Q 125 145, 150 125 L 160 135 Q 125 160, 90 200 Z" fill="#90A4AE"/>
+  <path d="M 148 122 L 158 135 L 170 125 L 160 112 Z" fill="#CFD8DC"/>
+  <rect x="28" y="310" width="34" height="30" rx="4" fill="#333333"/>
+  
+  <path d="M 30 320 V 210 C 20 180, 30 165, 55 165 H 80 C 100 165, 110 180, 110 200 V 300 C 110 315, 100 320, 85 320 Z M 60 200 V 290 H 90 V 200 Z" fill-rule="evenodd" fill="#2A2A2A"/>
+  <path d="M 30 320 V 210 C 20 180, 30 165, 55 165 H 80 C 100 165, 110 180, 110 200 V 300 C 110 315, 100 320, 85 320 Z M 60 200 V 290 H 90 V 200 Z" fill-rule="evenodd" fill="#000000" opacity="0.3" clip-path="url(#clip-pistola)" transform="translate(6, 6)"/>
+  <path d="M 30 320 V 210 C 20 180, 30 165, 55 165 H 80 C 100 165, 110 180, 110 200 V 300 C 110 315, 100 320, 85 320 Z M 60 200 V 290 H 90 V 200 Z" fill-rule="evenodd" fill="#FFFFFF" opacity="0.15" clip-path="url(#clip-pistola)" transform="translate(-6, -6)"/>
+  
+  <rect x="60" y="200" width="30" height="90" fill="#111111"/>
+  <rect x="66" y="210" width="12" height="60" rx="4" fill="#B0BEC5"/>
+
+  <rect x="200" y="35" width="310" height="380" rx="40" fill="currentColor"/>
+  <rect x="200" y="35" width="310" height="380" rx="40" fill="#000000" opacity="0.15" clip-path="url(#clip-disp)" transform="translate(15, 15)"/>
+  <rect x="200" y="35" width="310" height="380" rx="40" fill="#FFFFFF" opacity="0.35" clip-path="url(#clip-disp)" transform="translate(-15, -15)"/>
+
+  <rect x="225" y="65" width="260" height="170" rx="15" fill="#E8EBED" stroke="#B0BEC5" stroke-width="4"/>
+  <rect x="225" y="65" width="260" height="170" rx="15" fill="none" stroke="#000000" stroke-width="10" opacity="0.1" clip-path="url(#clip-pantalla)"/>
+
+  <rect x="245" y="85" width="220" height="130" rx="8" fill="#FFFFFF"/>
+  <rect x="260" y="100" width="190" height="40" rx="4" fill="#CFD8DC"/>
+  <rect x="260" y="155" width="190" height="40" rx="4" fill="#CFD8DC"/>
+
+  <path d="M 225 150 L 340 65 H 485 L 370 235 Z" fill="#FFFFFF" opacity="0.6" clip-path="url(#clip-pantalla)"/>
+
+  <rect x="245" y="280" width="100" height="18" rx="9" fill="#000000" opacity="0.2"/>
+  <rect x="245" y="315" width="100" height="18" rx="9" fill="#000000" opacity="0.2"/>
+  <rect x="245" y="350" width="100" height="18" rx="9" fill="#000000" opacity="0.2"/>
+
+  <rect x="400" y="270" width="70" height="100" rx="8" fill="#2A2A2A"/>
+  <rect x="410" y="290" width="50" height="8" rx="4" fill="#111111"/> <rect x="415" y="315" width="40" height="40" rx="4" fill="#111111"/> <circle cx="460" cy="380" r="5" fill="#4CAF50"/> </svg>

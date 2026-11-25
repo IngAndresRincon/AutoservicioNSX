@@ -1,0 +1,108 @@
+name: gnesys_as
+description: "Aplicacion Autoservicio de GNESYS"
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.2.3+1
+environment:
+  sdk: ^3.11.0
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  android_intent_plus: ^6.0.0
+  audioplayers: ^6.6.0
+  camera: ^0.12.0+1
+  cupertino_icons: ^1.0.8
+  device_info_plus: ^13.0.0
+  dio: ^5.9.2
+  flutter:
+    sdk: flutter
+  flutter_foreground_task: ^9.2.2
+  flutter_launcher_icons: ^0.14.4
+  flutter_svg: ^2.2.4
+  gif: ^2.3.0
+  go_router: ^17.1.0
+  intl: ^0.20.2
+  lottie: ^3.3.3
+  # Fork local (plugins/mobile_scanner): corrige la selección de cámara externa/USB,
+  # que en la versión oficial (hasta 7.4.0) nunca resuelve a LENS_FACING_EXTERNAL.
+  mobile_scanner:
+    path: plugins/mobile_scanner
+  network_info_plus: ^8.0.0
+  open_file: ^4.0.0
+  path_provider: ^2.1.5
+  permission_handler: ^12.0.1
+  qr_flutter: ^4.1.0
+  shared_preferences: ^2.5.4
+  shelf: ^1.4.2
+  shelf_router: ^1.1.4
+  socket_io_client: ^3.1.4
+  uuid: ^4.5.3
+  video_player: ^2.11.1
+  wakelock_plus: ^1.6.0
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_native_splash: ^2.4.7
+  flutter_test:
+    sdk: flutter
+
+flutter:
+
+  uses-material-design: true
+  # To add assets to your application, add an assets section, like this:
+  fonts:
+    - family: Digital7
+      fonts:
+        - asset: assets/fonts/digital7.ttf
+    - family: Monserrat
+      fonts:
+        - asset: assets/fonts/montserrat_regular.ttf
+        - asset: assets/fonts/montserrat_bold.ttf
+        - asset: assets/fonts/montserrat_semibold.ttf
+
+  assets:
+    - assets/gifs/
+    - assets/videos/
+    - assets/images/
+    - assets/vehicles/
+    - assets/fonts/
+    - assets/icons/
+    - assets/splash/
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icons/app_icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icons/app_icon.png"
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/splash/splash_logo.png
+  android_12:
+    # Android 12+ dibuja el icono dentro de un circulo: va solo la marca, con margen, y el nombre abajo como imagen de marca
+    image: assets/splash/splash_icon.png
+    branding: assets/splash/splash_branding.png
+    color: "#FFFFFF"
+  fullscreen: true
+  android_gravity: center

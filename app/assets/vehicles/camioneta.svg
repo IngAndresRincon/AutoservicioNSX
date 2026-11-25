@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440">
+<defs>
+ <linearGradient id="paint" x1="0" y1="0" x2=".15" y2="1"><stop stop-color="@BODY1@"/><stop offset=".52" stop-color="@MID@"/><stop offset="1" stop-color="@BODY2@"/></linearGradient>
+ <linearGradient id="window" x1="0" y1="0" x2=".5" y2="1"><stop stop-color="#102b35"/><stop offset=".75" stop-color="#020a12"/></linearGradient>
+ <radialGradient id="hub"><stop stop-color="@LIGHT@"/><stop offset=".24" stop-color="@NEON@"/><stop offset=".38" stop-color="#004452"/><stop offset=".74" stop-color="#04121b"/><stop offset="1" stop-color="#133844"/></radialGradient>
+ </defs>
+<path d="M48 296 L51 270 Q62 236 127 221 L298 196 L380 186 L480 110 Q500 92 553 91 L755 94 Q788 103 811 142 L832 196 L1139 192 L1170 215 L1176 292 L1147 317 L74 319Z" fill="url(#paint)" stroke="#287987" stroke-width="4"/>
+<path d="M386 185 L491 111 Q512 103 552 103 L754 107 Q780 113 800 147 L819 187Z" fill="url(#window)" stroke="@NEON@" stroke-width="3"/>
+<path d="M597 104 L591 188 M815 192 L816 295" stroke="#367e89" stroke-width="4"/>
+<path d="M382 187 L482 109 Q501 91 557 91 L755 94 Q794 100 812 147 L830 194 L1136 191" stroke="@NEON@" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="4"/>
+<path d="M357 214 L340 300 M591 194 L596 302 M825 197 L837 304" stroke="#217683" stroke-width="3"/>
+<path d="M345 250 L400 243 L385 268 L595 258 L813 252" stroke="@NEON@" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="5"/>
+<path d="M843 221 L1138 221 M833 298 L1156 298" stroke="@NEON@" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="3"/>
+<path d="M88 250 L169 225" stroke="@LIGHT@" stroke-linecap="round" fill="none" stroke-width="5"/>
+<path d="M1119 239 L1168 246 L1142 265 L1103 251Z" fill="@LIGHT@"/>
+<path d="M535 228 L567 228 M699 228 L730 228" stroke="#030d16" stroke-width="8" stroke-linecap="round"/>
+<path d="M552 191 L568 179 L599 180 L604 194Z" fill="url(#paint)" stroke="@NEON@" stroke-width="2"/>
+<g  transform="translate(268 314)"><circle r="84" fill="#010b13" stroke="#17404d" stroke-width="5"/><circle r="76" fill="none" stroke="@LIGHT@" stroke-width="6" /><circle r="65" fill="#03151e" stroke="@NEON@" stroke-width="5"/><circle r="54" fill="url(#hub)" stroke="#1e8994" stroke-width="3"/><circle r="41" fill="none" stroke="@NEON@" stroke-width="3" stroke-dasharray="5 8"/><circle r="33" fill="@NEON@" opacity=".8"/><path d="M -57 0 H 57 M0 -57 V57" stroke="@LIGHT@" stroke-width="2" opacity=".4"/></g>
+<g  transform="translate(969 314)"><circle r="84" fill="#010b13" stroke="#17404d" stroke-width="5"/><circle r="76" fill="none" stroke="@LIGHT@" stroke-width="6" /><circle r="65" fill="#03151e" stroke="@NEON@" stroke-width="5"/><circle r="54" fill="url(#hub)" stroke="#1e8994" stroke-width="3"/><circle r="41" fill="none" stroke="@NEON@" stroke-width="3" stroke-dasharray="5 8"/><circle r="33" fill="@NEON@" opacity=".8"/><path d="M -57 0 H 57 M0 -57 V57" stroke="@LIGHT@" stroke-width="2" opacity=".4"/></g>
+</svg>
