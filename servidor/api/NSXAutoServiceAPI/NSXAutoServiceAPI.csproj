@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NSXAutoservice.Core\NSXAutoservice.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Encripcion">
+      <HintPath>..\..\..\..\..\NSX2\NSX Plus\NSXPlus_(3)\NSXPlus\nsxplus\NSXPlus\Encripcion.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
