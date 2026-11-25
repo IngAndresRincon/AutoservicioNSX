@@ -140,6 +140,16 @@ exports.recordDispenserMapping = async (params) => {
           );
           const idScreen = resScreen.rows[0].id;
 
+          // Tiempo real configurado en la pagina; si el API no lo envia, se conserva lo que haya
+          const serial = String(dispenserSide.serialPantalla || "").trim();
+          if (serial && typeof params[i].tiempoReal === "boolean") {
+            await client.query(
+              `INSERT INTO public.pantalla_config (serial, tiempo_real, intervalo_ms) VALUES ($1,$2,$3)
+               ON CONFLICT (serial) DO UPDATE SET tiempo_real = EXCLUDED.tiempo_real, intervalo_ms = EXCLUDED.intervalo_ms;`,
+              [serial, params[i].tiempoReal, Math.min(5000, Math.max(200, Number(params[i].intervaloTiempoReal) || 500))],
+            );
+          }
+
           for (let k = 0; k < listPositions.length; k++) {
             query = `INSERT INTO public.posicion (id_dispensador,cara,id_nsx_posicion,
             mangueras,formato_dinero,formato_volumen,formato_precio,codigo_tankio,maximo_dinero)
