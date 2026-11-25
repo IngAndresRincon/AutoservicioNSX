@@ -7,3 +7,4 @@ controller.TerminalPaymentProcess();
 controller.TerminalStatusPayment();
 controller.TerminalApprovePayment();
 controller.TerminalStatusApprovePayment();
+controller.TerminalReleasePayment();
