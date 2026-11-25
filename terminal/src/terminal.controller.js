@@ -2,23 +2,42 @@ const service = require("./terminal.service");
 
 let terminals = [];
 
+// Esperas de los ciclos (ms)
+const TERMINAL_LIST_FIRST_RETRY_MS = 10000;
+const TERMINAL_LIST_REFRESH_MS = 600000;
+const PAYMENT_LOOP_MS = 500;
+const STATUS_LOOP_MS = 1000;
+const APPROVAL_LOOP_MS = 2000;
+const NO_APPROVAL_WAIT_MS = 60000;
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Atiende todas las terminales a la vez; un fallo en una no frena a las demas
+async function forEachTerminal(list, handler) {
+  const results = await Promise.allSettled(list.map(handler));
+  results.forEach((r) => {
+    if (r.status === "rejected") console.log(r.reason && r.reason.message ? r.reason.message : r.reason);
+  });
+}
+
 exports.findAvailableTerminalList = async () =>{
 
-  let timeout = 10000;
+  let timeout = TERMINAL_LIST_FIRST_RETRY_MS;
   while(true){
-    const records = await service.findAvailableTerminalList();
-    
-    if(records){
-      timeout = 600000;
-      terminals = [];
-      for(let i = 0; i< records.length; i++){
-        terminals.push(records[i]);
-        await new Promise((resolve) => setTimeout(resolve, 5000)); // Esperar 5 segundos
+    try {
+      const records = await service.findAvailableTerminalList();
+
+      if(records){
+        timeout = TERMINAL_LIST_REFRESH_MS;
+        // Se cambia la lista de una vez: nunca queda vacia mientras se recarga
+        terminals = records.slice();
+      }else{
+        console.error("No hay terminales disponibles");
       }
-    }else{
-      console.error("No hay terminales disponibles");
+    } catch (error) {
+      console.log(error.message);
     }
-    await new Promise((resolve) => setTimeout(resolve, timeout)); // Esperar 10 segundos
+    await sleep(timeout);
   }
 
 }
@@ -26,18 +45,16 @@ exports.findAvailableTerminalList = async () =>{
 exports.TerminalPaymentProcess = async () =>{
   while(true){
     try {
-      for(let i=0; i<terminals.length; i++){
-        const terminal = terminals[i];
+      await forEachTerminal(terminals, async (terminal) => {
         const record = await service.findTransactionPayment({statusId:0,terminal:terminal});
         if(record){
-          await service.generatePaymentRequets({terminal:terminals[i], payment:record});
+          await service.generatePaymentRequets({terminal:terminal, payment:record});
         }
-        await new Promise((resolve) => setTimeout(resolve, 2000)); // Esperar 10 segundos
-      }
+      });
     } catch (error) {
       console.log(error.message);
     }
-    await new Promise((resolve) => setTimeout(resolve,5000)); // Esperar 10 segundos
+    await sleep(PAYMENT_LOOP_MS);
   }
 }
 
@@ -46,19 +63,17 @@ exports.TerminalPaymentProcess = async () =>{
 exports.TerminalStatusPayment = async ()=>{
    while(true){
     try {
-      for(let i=0; i<terminals.length; i++){
-        const terminal = terminals[i];
+      await forEachTerminal(terminals, async (terminal) => {
         const record = await service.findTransactionPayment({statusId:4,terminal:terminal});
         if(record){
           await service.generateStatusPaymentRequets({
-            terminal:terminals[i],payment:record});
+            terminal:terminal,payment:record});
         }
-        await new Promise((resolve) => setTimeout(resolve, 5000)); // Esperar 10 segundos
-      }
+      });
     } catch (error) {
         console.log(error.message);
     }
-    await new Promise((resolve) => setTimeout(resolve, 2000)); // Esperar 10 segundos
+    await sleep(STATUS_LOOP_MS);
   }
 }
 
@@ -66,14 +81,13 @@ exports.TerminalStatusPayment = async ()=>{
 
 exports.TerminalApprovePayment = async () =>{
 
-  const timeout = 10000;
   while(true){
-    await new Promise((resolve) => setTimeout(resolve, timeout)); // Esperar 10 segundo
-    for(let i =0; i < terminals.length;i++)
-    {
+    await sleep(APPROVAL_LOOP_MS);
+    try {
       const terminal = terminals[0];
+      if(!terminal) continue;
       if(!terminal.approval) {
-        timeout = 360000;
+        await sleep(NO_APPROVAL_WAIT_MS);
         continue;
       }
       const records = await service.findApprovePayment(terminal,0); //0 Es para aprobaciones con sincronización en 0
@@ -81,7 +95,8 @@ exports.TerminalApprovePayment = async () =>{
         console.log(records);
         await service.sendPaymentApproval(terminal, records);
       }
-      await new Promise((resolve) => setTimeout(resolve, 15000)); // Esperar 5 segundos
+    } catch (error) {
+      console.log(error.message);
     }
   }
 }
@@ -89,23 +104,22 @@ exports.TerminalApprovePayment = async () =>{
 
 exports.TerminalStatusApprovePayment = async () =>{
 
-  let timeout = 5000;
-
   while(true){
-    await new Promise((resolve) => setTimeout(resolve, timeout)); // Esperar 1/2 segundo
-    for(let i =0; i < terminals.length;i++)
-    {
+    await sleep(APPROVAL_LOOP_MS);
+    try {
       const terminal = terminals[0];
+      if(!terminal) continue;
       if(!terminal.approval) {
-        timeout = 360000;
+        await sleep(NO_APPROVAL_WAIT_MS);
         continue;
-      };
+      }
       const records = await service.findApprovePayment(terminal,4);
       if(records.length>0){
         // console.log(records);
         await service.requestStatusApprovePayment(terminal, records);
       }
-      await new Promise((resolve) => setTimeout(resolve, 5000)); // Esperar 5 segundos
+    } catch (error) {
+      console.log(error.message);
     }
   }
 }
